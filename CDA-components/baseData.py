@@ -18,10 +18,10 @@ class baseData(object):
     def getLight(self) -> float:
         pass
 
-    def getsoilMoist(self) -> float:
+    def getMoist(self) -> float:
         pass
 
-    def getairMoist(self) -> float:
+    def getHumid(self) -> float:
         pass
 
     def setName(self):
