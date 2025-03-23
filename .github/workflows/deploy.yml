@@ -1,4 +1,4 @@
-name: Deploy til UnoEuro hosting
+name: Deploy til UnoEuro hosting med FTPS
 
 on:
   push:
@@ -6,23 +6,21 @@ on:
 
 jobs:
   deploy:
-    name: 🚀 Deploy website
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
       
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+    - name: Deploy til UnoEuro hosting via FTPS
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /public_html/
-        protocol: ftp
+        protocol: ftps
         port: 21
-        security: loose
-        timeout: 60000
+        security: strict  # Bruger "strict" for Explicit SSL
         exclude: |
           **/.git*
           **/.git*/**
@@ -31,3 +29,4 @@ jobs:
           .gitignore
           **/__pycache__/
         log-level: verbose
+        timeout: 60000  # Øget timeout for at håndtere SSL handshake
