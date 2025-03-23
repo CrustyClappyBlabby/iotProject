@@ -1,0 +1,27 @@
+name: Deploy to Simply.com
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Deploy to Simply.com
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: sftp.simply.com
+        username: noahwidahl
+        password: gN4RxW213BGpYDr5Qk0KEL9S
+        server-dir: /public_html/
+        protocol: ftps
+        security: loose
+        exclude: |
+          **/.git*
+          **/.git*/**
+          README.md
+          .github/
