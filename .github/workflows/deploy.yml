@@ -1,4 +1,4 @@
-name: Deploy to Simply.com
+name: Deploy til UnoEuro hosting
 
 on:
   push:
@@ -9,19 +9,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       
-    - name: Deploy to Simply.com
+    - name: Deploy til UnoEuro hosting
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        server: sftp.simply.com
-        username: noahwidahl
-        password: gN4RxW213BGpYDr5Qk0KEL9S
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /public_html/
-        protocol: ftps
+        protocol: ftp
+        port: 21
         security: loose
         exclude: |
           **/.git*
           **/.git*/**
           README.md
           .github/
+          .gitignore
+          **/__pycache__/
+        log-level: verbose
