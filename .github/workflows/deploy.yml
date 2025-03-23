@@ -6,21 +6,23 @@ on:
 
 jobs:
   deploy:
+    name: 🚀 Deploy website
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
       
-    - name: Deploy til UnoEuro hosting
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /public_html/
-        protocol: ftp
+        protocol: ftps
         port: 21
         security: loose
+        timeout: 60000
         exclude: |
           **/.git*
           **/.git*/**
