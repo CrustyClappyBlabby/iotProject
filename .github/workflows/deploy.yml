@@ -18,9 +18,9 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /public_html/
-        protocol: ftps
+        protocol: ftp
         port: 21
-        security: strict  # Bruger "strict" for Explicit SSL
+        security: loose
         exclude: |
           **/.git*
           **/.git*/**
@@ -29,4 +29,3 @@ jobs:
           .gitignore
           **/__pycache__/
         log-level: verbose
-        timeout: 60000  # Øget timeout for at håndtere SSL handshake
