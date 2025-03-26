@@ -12,25 +12,28 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       
-    # Create directory structure and copy files
+    # Create flat deployment structure and ensure all files are up-to-date
     - name: Prepare files for deployment
       run: |
-        # Create directories if they don't exist
-        mkdir -p deploy/frontend
+        # Display the current files for debugging
+        echo "Current frontend files:"
+        ls -la frontend/
         
-        # Copy frontend files to their respective directories
-        cp frontend/index.html deploy/frontend/
-        cp frontend/styles.css deploy/frontend/
-        cp frontend/dashboard-loader.js deploy/frontend/
+        # Create a deployment directory
+        mkdir -p deploy
         
-        # Copy frontend files to root as well (for compatibility)
-        cp frontend/index.html deploy/
-        cp frontend/styles.css deploy/
-        cp frontend/dashboard-loader.js deploy/
+        # Copy frontend files to the deployment directory with the latest changes
+        cp -f frontend/index.html deploy/
+        cp -f frontend/styles.css deploy/
+        cp -f frontend/dashboard-loader.js deploy/
         
-        echo "Prepared files for deployment"
+        # Display the deployment directory contents
+        echo "Files prepared for deployment:"
+        ls -la deploy/
+        
+        echo "Prepared files for deployment with flat structure and latest changes"
       
-    # Deploy to Simply.com via FTPS
+    # Deploy to Simply.com via FTPS with force overwrite
     - name: Deploy to Simply.com via FTPS
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
@@ -42,7 +45,7 @@ jobs:
         port: 21
         security: loose
         timeout: 120000
-        dangerous-clean-slate: false
+        dangerous-clean-slate: true # Force overwrite existing files
         local-dir: ./deploy/
         exclude: |
           **/.git*
@@ -51,4 +54,4 @@ jobs:
           .github/
           .gitignore
           **/__pycache__/
-        log-level: verbose
+        log-level: standard
