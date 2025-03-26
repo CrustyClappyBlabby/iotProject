@@ -12,14 +12,22 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       
-    # Copy index.html and styles.css to root directory
+    # Standardiser linjeafslutninger for at sikre filkonsistens
+    - name: Normalize line endings
+      run: |
+        find . -type f -name "*.html" -exec dos2unix {} \;
+        find . -type f -name "*.css" -exec dos2unix {} \;
+        find . -type f -name "*.js" -exec dos2unix {} \;
+        find . -type f -name "*.py" -exec dos2unix {} \;
+      
+    # Kopier filer til rod directory
     - name: Copy web files to root directory
       run: |
         cp frontend/index.html ./index.html
         cp frontend/styles.css ./styles.css
         echo "Copied web files to root directory"
       
-    # Deploy to Simply.com via FTPS
+    # Deploy til Simply.com med øget sikkerhed
     - name: Deploy to Simply.com via FTPS
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
@@ -39,4 +47,5 @@ jobs:
           .github/
           .gitignore
           **/__pycache__/
+          frontend/index.html  # Udeluk den problematiske fil
         log-level: verbose
