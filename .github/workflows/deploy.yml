@@ -12,13 +12,23 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       
-    # Copy index.html and styles.css to root directory
-    - name: Copy web files to root directory
+    # Create directory structure and copy files
+    - name: Prepare files for deployment
       run: |
-        cp frontend/index.html ./index.html
-        cp frontend/styles.css ./styles.css
-        cp frontend/dashboard-loader.js ./dashboard-loader.js
-        echo "Copied web files to root directory"
+        # Create directories if they don't exist
+        mkdir -p deploy/frontend
+        
+        # Copy frontend files to their respective directories
+        cp frontend/index.html deploy/frontend/
+        cp frontend/styles.css deploy/frontend/
+        cp frontend/dashboard-loader.js deploy/frontend/
+        
+        # Copy frontend files to root as well (for compatibility)
+        cp frontend/index.html deploy/
+        cp frontend/styles.css deploy/
+        cp frontend/dashboard-loader.js deploy/
+        
+        echo "Prepared files for deployment"
       
     # Deploy to Simply.com via FTPS
     - name: Deploy to Simply.com via FTPS
@@ -33,6 +43,7 @@ jobs:
         security: loose
         timeout: 120000
         dangerous-clean-slate: false
+        local-dir: ./deploy/
         exclude: |
           **/.git*
           **/.git*/**
