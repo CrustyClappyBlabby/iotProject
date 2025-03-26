@@ -29,3 +29,4 @@ jobs:
           .gitignore
           **/__pycache__/
         log-level: verbose
+        timeout: 60000
