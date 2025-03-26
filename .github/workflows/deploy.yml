@@ -12,18 +12,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       
-    # Add a delay before FTP deployment to ensure clean connection
-    - name: Wait for 5 seconds
-      run: sleep 5
-      
-    # Test network connectivity to server
-    - name: Test connectivity to FTP server
+    # Copy index.html and styles.css to root directory
+    - name: Copy web files to root directory
       run: |
-        echo "Testing connection to FTP server..."
-        nc -zv ${{ secrets.FTP_SERVER }} 21 || echo "Connection test completed"
-      continue-on-error: true  # Continue even if this check fails
+        cp frontend/index.html ./index.html
+        cp frontend/styles.css ./styles.css
+        echo "Copied web files to root directory"
       
-    # Try with FTPS instead of FTP
+    # Deploy to Simply.com via FTPS
     - name: Deploy to Simply.com via FTPS
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
@@ -31,33 +27,11 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /public_html/
-        protocol: ftps  # Try FTPS instead of FTP
+        protocol: ftps
         port: 21
         security: loose
-        timeout: 120000  # Increase timeout to 2 minutes
-        dangerous-clean-slate: false  # Don't delete existing files
-        exclude: |
-          **/.git*
-          **/.git*/**
-          README.md
-          .github/
-          .gitignore
-          **/__pycache__/
-        log-level: verbose
-        
-    # Fallback deployment method if the primary one fails
-    - name: Fallback - Deploy using basic FTP command
-      if: failure()  # Only run this step if the previous FTP step failed
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: /public_html/
-        protocol: ftp  # Fall back to regular FTP
-        port: 21
-        security: loose
-        timeout: 60000
+        timeout: 120000
+        dangerous-clean-slate: false
         exclude: |
           **/.git*
           **/.git*/**
