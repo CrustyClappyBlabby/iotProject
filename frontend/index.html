@@ -7,22 +7,35 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>IoT Dashboard</h1>
-    </header>
-    
-    <div class="dashboard-container">
-        <div class="dashboard-title">
-            <h2>Sensor Data Visualisering</h2>
-        </div>
-        <!-- Dashboards will be added here by JavaScript -->
-    </div>
-    
-    <footer>
-        <p>&copy; 2025, HONN.DK IoT Project</p>
-    </footer>
+    <!-- Sidebar menu -->
+    <div class="container">
+        <nav class="sidebar">
+            <div class="Logo">
+                <div class="logo-container">
+                    <h1>Leaf<sub>ITM</sub></h1>
+                    <img src="icons/logo.png" alt="Leaf it to me" class="logo-image">
+                </div>
+            </div>
+            <!-- Navigation Bar -->
+            <ul class="navigation">
+                <li><a href="livingRoom.html" class="nav-item">Living Room</a></li>
+                <li><a href="kitchen.html" class="nav-item">Living Room</a></li>
+                <li><a href="bedroom.html" class="nav-item">Living Room</a></li>
+            </ul>
+        </nav>
 
-    <!-- Load dashboard script -->
-    <script src="dashboard-loader.js"></script>
+        <!-- Front page -->
+        <main class="frontPage">
+            <header>
+                <h2>Welcome User</h2>
+                <!-- Plant status -->
+                <p class="status">Plant levels look good!</p>
+            </header>
+
+            <section class="dashboard">
+                <!-- Plants in need of ASSistance go here u_u -->
+            </section>
+        </main>
+    </div>
 </body>
 </html>

@@ -1,49 +1,110 @@
-body {
-    font-family: Arial, sans-serif;
+/* Reset and base style? */
+
+* {
     margin: 0;
-    padding: 20px;
-    background-color: #f5f7f9;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #333;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Navigation bar */
+.sidebar {
+    width: 20%;
+    max-width: 15rem;
+    min-width: 10rem;
+    background-color: azure;
+    border-right: 1px solid azure;
+    padding: 20px 0;
+}
+
+.logo {
+    padding: 5% 10%;
+    margin-bottom: 5%;
+}
+
+.logo-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    color: #333;
+    order: 1;
+}
+
+.logo sub {
+    font-size: 0.6rem;
+    vertical-align: super;
+}
+
+.logo-image {
+    width: 3rem;
+    max-width: 3rem;
+    object-fit: contain;
+    order: 2;
+}
+
+.navigation {
+    list-style: none;
+    margin-top: 5%;
+}
+
+.nav-item {
+    display: block;
+    padding: 0.8rem 10%;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #333;
+}
+
+.nav-item:hover, nav-item.active {
+    background-color: azure;
+}
+
+/* Front page */
+.content {
+    flex: 1;
+    padding: 2% 3%;
+    background-color: azure;
 }
 
 header {
-    background-color: #3c8a6b;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 3%;
 }
 
-.dashboard-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+h2 {
+    margin-bottom: 0.5rem;
+    font-weight: normal;
+    font-size: 1.75rem;
 }
 
-.dashboard-title {
-    text-align: center;
-    margin-bottom: 20px;
+.status {
+    color: #333;
+    font-size: 1rem;
 }
 
-.grafana-panel {
-    margin-bottom: 30px;
-}
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
 
-.grafana-panel h2 {
-    margin-bottom: 10px;
-    color: #3c8a6b;
-}
-
-iframe {
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-footer {
-    text-align: center;
-    margin-top: 30px;
-    color: #666;
+    .sidebar {
+        width: 100%;
+        height: auto;
+        min-height: 15vh;
+    }
 }

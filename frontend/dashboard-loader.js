@@ -12,11 +12,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const dashboards = [
       {
         title: "Temperature",
-        url: "https://h01st.grafana.net/d-solo/feh44r4tdzgn4e/temperature?orgId=1&from=1743088363400&to=1743088411599&timezone=browser&panelId=1&__feature.dashboardSceneSolo"
+        url: "https://h01st.grafana.net/d-solo/feh44r4tdzgn4e/temperature?orgId=1&timezone=browser&panelId=1&__feature.dashboardSceneSolo"
       },
       {
         title: "Humidity",
-        url: "https://h01st.grafana.net/d-solo/eeh44w2ugyjnkd/humidity?orgId=1&from=1743088428826&to=1743088464831&timezone=browser&panelId=2&__feature.dashboardSceneSolo"
+        url: "https://h01st.grafana.net/d-solo/eeh44w2ugyjnkd/humidity?orgId=1&timezone=browser&panelId=2&__feature.dashboardSceneSolo"
       }
     ];
     
