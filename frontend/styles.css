@@ -70,8 +70,8 @@ body {
     color: #333;
     border-bottom: 1px solid #333;
 }
-
-.nav-item:hover, nav-item.active {
+/* nav-item.active needs to be here to change active rooms */
+.nav-item:hover {
     background-color: azure;
 }
 
