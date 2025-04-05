@@ -1,127 +1,388 @@
-/* Reset and base style? */
+/* 
+  Leaf ITM - Main Stylesheet
+  A clean, minimalist plant monitoring dashboard using Bootstrap
+*/
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Arial, sans-serif; /* Claude havde et fedt font */
-    color: #333;
-    line-height: 1.6;
-    font-size: 16px;
-}
-
-.container {
-    display: flex;
+/* Core Variables */
+:root {
+    /* Main colors */
+    --leaf-green: #2e7d32;
+    --leaf-light-green: rgba(46, 125, 50, 0.05);
+    --leaf-yellow: #ffeb3b;
+    --leaf-red: #f44336;
+    --leaf-blue: #2196f3;
+    
+    /* Status colors */
+    --status-good: #4caf50;
+    --status-warning: #ffeb3b; 
+    --status-neutral: #ffeb3b;
+    --status-bad: #f44336;
+    
+    /* Other colors */
+    --text-primary: #333;
+    --text-secondary: #666;
+    --border-light: #eee;
+  }
+  
+  /* Basic Layout */
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: var(--text-primary);
+  }
+  
+  /* Sidebar Styles */
+  .sidebar {
+    width: 180px;
+    background-color: white;
     min-height: 100vh;
-    width: 100%;
-}
-
-/* Navigation bar */
-.sidebar {
-    width: 20%;
-    max-width: 15rem;
-    min-width: 10rem;
-    background-color: azure;
-    height: 100vh;
-    padding: 2rem 0;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-}
-
-.logo {
-    padding: 0 10% 1.5rem;
-    margin-bottom: 5rem;
-    border-bottom: 1px solid rgba(0,0,0,0.07);
-}
-
-.logo-container {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+    padding-top: 1rem;
+  }
+  
+  .leaf-logo {
+    padding: 1.25rem 1rem;
+    font-size: 1.375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-light);
+  }
+  
+  .leaf-logo sup {
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+  }
+  
+  .nav-link {
+    color: #444;
+    padding: 0.8rem 1.25rem;
+    border-radius: 0;
+    transition: all 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  
+  .nav-link.active {
+    background-color: var(--leaf-light-green);
+    color: var(--leaf-green);
+    font-weight: 500;
+    border-left: 4px solid var(--leaf-green);
+  }
+  
+  .nav-icon {
+    width: 24px;
+    margin-right: 0.75rem;
+    display: inline-block;
+    text-align: center;
+  }
+  
+  /* Main Content Area */
+  .main-content {
+    background-color: white;
+    min-height: 100vh;
+  }
+  
+  .page-title {
+    font-size: 1.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Alert Status */
+  .alert-status {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    color: white;
+    display: inline-block;
+  }
+  
+  .alert-good {
+    background-color: var(--status-good);
+  }
+  
+  .alert-warning {
+    background-color: var(--status-warning);
+    color: #333;
+  }
+  
+  .alert-neutral {
+    background-color: var(--status-neutral);
+    color: #333;
+  }
+  
+  .alert-bad {
+    background-color: var(--status-bad);
+  }
+  
+  /* Plant Cards */
+  .plant-card {
+    border: none;
+    transition: all 0.2s ease;
+    overflow: hidden;
+  }
+  
+  .plant-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .plant-header {
+    background-color: white;
+    padding: 1rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-}
-
-.logo h1 {
-    font-size: 1.6rem;
-    color: #333;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .plant-header:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .plant-name {
     font-weight: 500;
-    margin: 0;
-}
-
-.logo sub {
-    font-size: 0.6rem;
-    vertical-align: super;
-}
-
-.logo-image {
-    width: 2.5rem;
-    height: 2.5rem;
-}
-
-.navigation {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.nav-item {
-    display: block;
-    padding: 0.9rem 15%;
-    text-decoration: none;
-    color: #333;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    transition: all 0.2s ease;
-    font-size: 1.05rem;
-}
-
-/* nav-item.active needs to be here to change active rooms */
-.nav-item:hover {
-    background-color: rgba(255,255,255,0.7);
-    padding-left: 17%;
-}
-
-.nav-item.active {
-    font-weight: bold;
-    background-color: rgba(255,255,255,0.9);
-    padding-left: calc(15% - 4px);
-}
-
-.frontPage {
+    font-size: 1.125rem;
+    width: 30%;
+  }
+  
+  .plant-indicators {
+    display: flex;
+    gap: 15px;
     flex: 1;
-    padding: 2.5rem 4%;
-    background-color: azure;
+    justify-content: center;
+  }
+  
+  .indicator-item, .mini-status-item {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .indicator-item span, .mini-status-item span {
+    font-size: 1.25rem;
+  }
+  
+  .toggle-icon {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  
+  .toggle-icon span {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  
+  /* Rotated toggle icon when expanded */
+  .collapse.show + .card-body .toggle-icon,
+  .plant-header[aria-expanded="true"] .toggle-icon {
+    transform: rotate(180deg);
+  }
+  
+  /* Status Colors */
+  .good {
+    background-color: var(--status-good);
+  }
+  
+  .warning {
+    background-color: var(--status-warning);
+  }
+  
+  .neutral {
+    background-color: var(--status-neutral);
+  }
+  
+  .bad {
+    background-color: var(--status-bad);
+  }
+  
+  /* Metric Cards */
+  .metric-card {
+    position: relative;
+    padding-bottom: 30px;
+    margin-bottom: 20px;
+  }
+  
+  .metric-title {
+    font-size: 1rem;
+    margin-bottom: 10px;
     text-align: center;
-}
-
-header {
-    margin-bottom: 2.5rem;
-    text-align: center;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #333;
-}
-
-header h2 {
-    margin-bottom: 0.5rem;
+  }
+  
+  .chart-container {
+    height: 150px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .chart-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  .metric-status {
+    position: absolute;
+    bottom: -12px;
+    left: calc(50% - 15px);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Environmental Metrics */
+  .env-metric {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .env-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+  }
+  
+  .env-icon span {
+    font-size: 1.5rem;
+  }
+  
+  .env-details h6 {
+    margin-bottom: 0;
     font-weight: 500;
-    font-size: 1.9rem;
+  }
+  
+  .env-details span {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+  
+  /* Dashboard Summary Cards */
+  .mini-status-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .status-percent {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    color: white;
+  }
+  
+  .status-label {
+    font-size: 0.875rem;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+  
+  .status-percent.good {
+    background-color: var(--status-good);
+  }
+  
+  .status-percent.warning {
+    background-color: var(--status-warning);
     color: #333;
-}
-
-.status {
-    color: #333;
-    font-size: 1.1rem;
-}
-
-@media (max-width: 768px) {
-    .container {
-        flex-direction: column;
+  }
+  
+  .status-percent.bad {
+    background-color: var(--status-bad);
+  }
+  
+  .health-summary-chart {
+    padding: 1rem 0;
+  }
+  
+  .health-status {
+    margin-bottom: 1rem;
+  }
+  
+  /* Placeholder Charts */
+  .placeholder-chart {
+    height: 100%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+  }
+  
+  .placeholder-text {
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .plant-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
     }
-
+    
+    .plant-name {
+      width: 100%;
+    }
+    
+    .plant-indicators {
+      justify-content: flex-start;
+    }
+    
+    .toggle-icon {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
     .sidebar {
-        width: 100%;
-        height: auto;
-        min-height: auto;
-        max-width: none;
+      width: 100%;
+      min-height: auto;
+      position: sticky;
+      top: 0;
     }
-}
+    
+    .nav.flex-column {
+      flex-direction: row !important;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    
+    .nav-link {
+      white-space: nowrap;
+      border-left: none !important;
+      border-bottom: 4px solid transparent;
+    }
+    
+    .nav-link.active {
+      border-bottom: 4px solid var(--leaf-green);
+    }
+  }

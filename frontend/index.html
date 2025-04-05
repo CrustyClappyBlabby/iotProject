@@ -1,43 +1,172 @@
 <!DOCTYPE html>
-<html lang="da">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT Dashboard - HONN.DK</title>
+    <title>Leaf ITM - Plant Monitoring</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Sidebar menu -->
-    <div class="container">
-        <nav class="sidebar">
-            <div class="Logo">
-                <div class="logo-container">
-                    <h1>Leaf<sub>ITM</sub></h1>
-                    <img src="icons/logo.png" alt="Leaf it to me" class="logo-image">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="col-auto sidebar">
+                <div class="leaf-logo">Leaf<sup>ITM</sup></div>
+                <div class="nav flex-column">
+                    <a class="nav-link active" href="index.html">
+                        <span class="nav-icon">🏠</span> Overview
+                    </a>
+                    <a class="nav-link" href="livingRoom.html">
+                        <span class="nav-icon">🛋️</span> Living Room
+                    </a>
+                    <a class="nav-link" href="kitchen.html">
+                        <span class="nav-icon">🍽️</span> Kitchen
+                    </a>
+                    <a class="nav-link" href="bedroom.html">
+                        <span class="nav-icon">🛏️</span> Bedroom
+                    </a>
                 </div>
             </div>
-            <!-- Navigation Bar -->
-            <ul class="navigation">
-            <!-- js function makeRoom generates the rooms -->
-            </ul>
-        </nav>
 
-        <!-- Front page -->
-        <main class="frontPage">
-            <header>
-                <h2>Welcome User</h2>
-                <!-- Plant status -->
-            </header>
-            <h2 class="status">Plant levels look good!</h2>
-            <!-- Room specefic content -->
-            <section class="dashboard">
+            <!-- Main Content -->
+            <div class="col main-content">
+                <div class="container py-4">
+                    <header class="mb-4">
+                        <h1 class="page-title">Plant Overview</h1>
+                        <div class="alert-status alert-neutral">All plants are monitored and tracked</div>
+                    </header>
 
-                <div class="content-area">
-                    <!-- Script runs content here -->
+                    <!-- Room Summary Cards -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title d-flex justify-content-between">
+                                        <span>Living Room</span>
+                                        <span>
+                                            <span>✅</span>
+                                        </span>
+                                    </h5>
+                                    <div class="mini-status-row my-3">
+                                        <div class="mini-status-item good">
+                                            <span>💧</span>
+                                        </div>
+                                        <div class="mini-status-item good">
+                                            <span>🌡️</span>
+                                        </div>
+                                        <div class="mini-status-item good">
+                                            <span>☀️</span>
+                                        </div>
+                                    </div>
+                                    <p class="card-text">3 plants monitored</p>
+                                    <a href="livingRoom.html" class="btn btn-outline-success mt-2">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title d-flex justify-content-between">
+                                        <span>Kitchen</span>
+                                        <span>
+                                            <span>⚠️</span>
+                                        </span>
+                                    </h5>
+                                    <div class="mini-status-row my-3">
+                                        <div class="mini-status-item warning">
+                                            <span>💧</span>
+                                        </div>
+                                        <div class="mini-status-item good">
+                                            <span>🌡️</span>
+                                        </div>
+                                        <div class="mini-status-item good">
+                                            <span>☀️</span>
+                                        </div>
+                                    </div>
+                                    <p class="card-text">2 plants need attention</p>
+                                    <a href="kitchen.html" class="btn btn-outline-success mt-2">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title d-flex justify-content-between">
+                                        <span>Bedroom</span>
+                                        <span>
+                                            <span>🚨</span>
+                                        </span>
+                                    </h5>
+                                    <div class="mini-status-row my-3">
+                                        <div class="mini-status-item bad">
+                                            <span>💧</span>
+                                        </div>
+                                        <div class="mini-status-item good">
+                                            <span>🌡️</span>
+                                        </div>
+                                        <div class="mini-status-item warning">
+                                            <span>☀️</span>
+                                        </div>
+                                    </div>
+                                    <p class="card-text">Immediate attention required!</p>
+                                    <a href="bedroom.html" class="btn btn-outline-success mt-2">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Statistics -->
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">Environmental Overview</h5>
+                                    <div class="chart-container">
+                                        <!-- Grafana iframe would go here -->
+                                        <div class="placeholder-chart">
+                                            <div class="placeholder-text">Weekly Temperature & Humidity Trends</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Plant Health Summary</h5>
+                                    <div class="health-summary-chart">
+                                        <div class="health-status">
+                                            <div class="status-percent good">70%</div>
+                                            <div class="status-label">Healthy</div>
+                                        </div>
+                                        <div class="health-status">
+                                            <div class="status-percent warning">20%</div>
+                                            <div class="status-label">Needs Attention</div>
+                                        </div>
+                                        <div class="health-status">
+                                            <div class="status-percent bad">10%</div>
+                                            <div class="status-label">Critical</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
     </div>
+
+    <!-- Popper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.min.js" integrity="sha384-VQqxDN0EQCkWoxt/0vsQvZswzTHUVOImccYmSyhJTp7kGtPed0Qcx8rK9h9YEgx+" crossorigin="anonymous"></script>
+    <!-- Custom JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>

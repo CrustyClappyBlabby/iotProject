@@ -2,9 +2,282 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen - Leaf ITM</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="col-auto sidebar">
+                <div class="leaf-logo">Leaf<sup>ITM</sup></div>
+                <div class="nav flex-column">
+                    <a class="nav-link" href="index.html">
+                        <span class="nav-icon">🏠</span> Overview
+                    </a>
+                    <a class="nav-link" href="livingRoom.html">
+                        <span class="nav-icon">🛋️</span> Living Room
+                    </a>
+                    <a class="nav-link active" href="kitchen.html">
+                        <span class="nav-icon">🍽️</span> Kitchen
+                    </a>
+                    <a class="nav-link" href="bedroom.html">
+                        <span class="nav-icon">🛏️</span> Bedroom
+                    </a>
+                </div>
+            </div>
 
+            <!-- Main Content -->
+            <div class="col main-content">
+                <div class="container py-4">
+                    <header class="mb-4">
+                        <h1 class="page-title">Kitchen</h1>
+                        <div class="alert-status alert-warning">Some plants need attention</div>
+                    </header>
+
+                    <!-- Environmental Summary -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Environmental Overview</h5>
+                            <div class="row mt-3">
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="env-metric">
+                                        <div class="env-icon warning">
+                                            <span>💧</span>
+                                        </div>
+                                        <div class="env-details">
+                                            <h6>Moisture</h6>
+                                            <span>Below optimal</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="env-metric">
+                                        <div class="env-icon good">
+                                            <span>🌡️</span>
+                                        </div>
+                                        <div class="env-details">
+                                            <h6>Temperature</h6>
+                                            <span>21°C - Optimal</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="env-metric">
+                                        <div class="env-icon warning">
+                                            <span>☀️</span>
+                                        </div>
+                                        <div class="env-details">
+                                            <h6>Light</h6>
+                                            <span>Slightly low</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="env-metric">
+                                        <div class="env-icon good">
+                                            <span>💦</span>
+                                        </div>
+                                        <div class="env-details">
+                                            <h6>Humidity</h6>
+                                            <span>45% - Good</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plant Monitoring Section -->
+                    <div class="plant-section">
+                        <!-- Plant 1: Herb Garden -->
+                        <div class="card plant-card shadow-sm mb-4">
+                            <div class="card-header plant-header" data-toggle-target="#herbDetails">
+                                <div class="plant-name">Herb Garden</div>
+                                <div class="plant-indicators">
+                                    <div class="indicator-item warning" title="Moisture">
+                                        <span>💧</span>
+                                    </div>
+                                    <div class="indicator-item neutral" title="Happiness">
+                                        <span>😐</span>
+                                    </div>
+                                    <div class="indicator-item warning" title="Water">
+                                        <span>💦</span>
+                                    </div>
+                                    <div class="indicator-item good" title="Temperature">
+                                        <span>🌡️</span>
+                                    </div>
+                                    <div class="indicator-item warning" title="Light">
+                                        <span>☀️</span>
+                                    </div>
+                                    <div class="indicator-item warning" title="Overall Health">
+                                        <span>❤️</span>
+                                    </div>
+                                </div>
+                                <div class="toggle-icon">
+                                    <span>⌄</span>
+                                </div>
+                            </div>
+                            <div id="herbDetails" class="collapse show">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="metric-card">
+                                                <h5 class="metric-title">Moisture Level</h5>
+                                                <div class="chart-container">
+                                                    <!-- Grafana iframe for moisture -->
+                                                    <iframe 
+                                                        src="https://h01st.grafana.net/d-solo/feh44r4tdzgn4e/moisture?orgId=1&panelId=4&theme=light"
+                                                        frameborder="0"
+                                                        data-plant-id="herb"
+                                                        data-metric="moisture">
+                                                    </iframe>
+                                                </div>
+                                                <div class="metric-status warning">
+                                                    <span>💧</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="metric-card">
+                                                <h5 class="metric-title">Temperature</h5>
+                                                <div class="chart-container">
+                                                    <!-- Grafana iframe for temperature -->
+                                                    <iframe 
+                                                        src="https://h01st.grafana.net/d-solo/feh44r4tdzgn4e/temperature?orgId=1&panelId=4&theme=light"
+                                                        frameborder="0"
+                                                        data-plant-id="herb"
+                                                        data-metric="temperature">
+                                                    </iframe>
+                                                </div>
+                                                <div class="metric-status good">
+                                                    <span>🌡️</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="metric-card">
+                                                <h5 class="metric-title">Light Intensity</h5>
+                                                <div class="chart-container">
+                                                    <!-- Grafana iframe for light -->
+                                                    <iframe 
+                                                        src="https://h01st.grafana.net/d-solo/feh44r4tdzgn4e/light?orgId=1&panelId=4&theme=light"
+                                                        frameborder="0"
+                                                        data-plant-id="herb"
+                                                        data-metric="light">
+                                                    </iframe>
+                                                </div>
+                                                <div class="metric-status warning">
+                                                    <span>☀️</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Plant 2: Mint Plant -->
+                        <div class="card plant-card shadow-sm mb-4">
+                            <div class="card-header plant-header" data-toggle-target="#mintDetails">
+                                <div class="plant-name">Mint</div>
+                                <div class="plant-indicators">
+                                    <div class="indicator-item good" title="Moisture">
+                                        <span>💧</span>
+                                    </div>
+                                    <div class="indicator-item good" title="Happiness">
+                                        <span>😊</span>
+                                    </div>
+                                    <div class="indicator-item good" title="Water">
+                                        <span>💦</span>
+                                    </div>
+                                    <div class="indicator-item good" title="Temperature">
+                                        <span>🌡️</span>
+                                    </div>
+                                    <div class="indicator-item good" title="Light">
+                                        <span>☀️</span>
+                                    </div>
+                                    <div class="indicator-item good" title="Overall Health">
+                                        <span>❤️</span>
+                                    </div>
+                                </div>
+                                <div class="toggle-icon">
+                                    <span>⌄</span>
+                                </div>
+                            </div>
+                            <div id="mintDetails" class="collapse">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="metric-card">
+                                                <h5 class="metric-title">Moisture Level</h5>
+                                                <div class="chart-container">
+                                                    <!-- Grafana iframe for moisture -->
+                                                    <iframe 
+                                                        src="https://h01st.grafana.net/d-solo/feh44r4tdzgn4e/moisture?orgId=1&panelId=5&theme=light"
+                                                        frameborder="0"
+                                                        data-plant-id="mint"
+                                                        data-metric="moisture">
+                                                    </iframe>
+                                                </div>
+                                                <div class="metric-status good">
+                                                    <span>💧</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="metric-card">
+                                                <h5 class="metric-title">Temperature</h5>
+                                                <div class="chart-container">
+                                                    <!-- Grafana iframe for temperature -->
+                                                    <iframe 
+                                                        src="https://h01st.grafana.net/d-solo/feh44r4tdzgn4e/temperature?orgId=1&panelId=5&theme=light"
+                                                        frameborder="0"
+                                                        data-plant-id="mint"
+                                                        data-metric="temperature">
+                                                    </iframe>
+                                                </div>
+                                                <div class="metric-status good">
+                                                    <span>🌡️</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="metric-card">
+                                                <h5 class="metric-title">Light Intensity</h5>
+                                                <div class="chart-container">
+                                                    <!-- Grafana iframe for light -->
+                                                    <iframe 
+                                                        src="https://h01st.grafana.net/d-solo/feh44r4tdzgn4e/light?orgId=1&panelId=5&theme=light"
+                                                        frameborder="0"
+                                                        data-plant-id="mint"
+                                                        data-metric="light">
+                                                    </iframe>
+                                                </div>
+                                                <div class="metric-status good">
+                                                    <span>☀️</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.min.js" integrity="sha384-VQqxDN0EQCkWoxt/0vsQvZswzTHUVOImccYmSyhJTp7kGtPed0Qcx8rK9h9YEgx+" crossorigin="anonymous"></script>
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>
