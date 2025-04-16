@@ -323,6 +323,17 @@
   .health-status {
     margin-bottom: 1rem;
   }
+
+  .chart-container {
+    min-height: 300px;
+    width: 100%;
+}
+
+.chart-container iframe {
+    width: 100%;
+    height: 300px;
+    border: none;
+}
   
   /* Placeholder Charts */
   .placeholder-chart {
