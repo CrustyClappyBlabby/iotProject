@@ -5,7 +5,7 @@ from .base_sensor import BaseSensor
 class DHT11Sensor(BaseSensor):
     def __init__(self, sensor_id):
         super().__init__(sensor_id)
-        self.sensor = adafruit_dht.DHT11(board.D4, use_pulseio=False)
+        self.sensor = adafruit_dht.DHT11(board.D27, use_pulseio=False)
 
     def read(self):
         try:

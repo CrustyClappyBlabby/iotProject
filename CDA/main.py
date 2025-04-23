@@ -28,7 +28,7 @@ try:
                 payload = json.dumps(sensor.format_data(data, timestamp))
                 print(f"[Publish] {payload}")
                 publisher.publish(payload)
-        time.sleep(3)
+        time.sleep(10)
 except KeyboardInterrupt:
     print("\n[System] Interrupted. Cleaning up...")
     for sensor in sensors:
