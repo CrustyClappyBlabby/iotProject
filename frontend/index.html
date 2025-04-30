@@ -50,23 +50,23 @@
                                     <div class="summary-stats mt-3 mb-3">
                                         <div class="d-flex justify-content-between">
                                             <div>Plants: <strong>3</strong></div>
-                                            <div>Status: <span id="livingroom-health" class="health-percentage neutral"></span></div>
+                                            <div>Status: <span id="livingRoom-health" class="health-percentage neutral" data-room="livingRoom"></span></div>
                                         </div>
                                     </div>
                                     <div class="plant-list">
                                         <div class="small-plant-item">
                                             <span class="plant-name">Ficus</span>
-                                            <span id="ficus-overview-status" class="status-badge neutral"></span>
+                                            <span id="ficus-overview-status" class="status-badge neutral" data-plant="ficus" data-room="livingRoom"></span>
                                             <span id="ficus-health" class="health-percentage neutral"></span>
                                         </div>
                                         <div class="small-plant-item">
                                             <span class="plant-name">Peace Lily</span>
-                                            <span id="lily-overview-status" class="status-badge neutral"></span>
+                                            <span id="lily-overview-status" class="status-badge neutral" data-plant="lily" data-room="livingRoom"></span>
                                             <span id="lily-health" class="health-percentage neutral"></span>
                                         </div>
                                         <div class="small-plant-item">
                                             <span class="plant-name">Cactus</span>
-                                            <span id="cactus-overview-status" class="status-badge neutral"></span>
+                                            <span id="cactus-overview-status" class="status-badge neutral" data-plant="cactus" data-room="livingRoom"></span>
                                             <span id="cactus-health" class="health-percentage neutral"></span>
                                         </div>
                                     </div>
@@ -83,18 +83,18 @@
                                     <div class="summary-stats mt-3 mb-3">
                                         <div class="d-flex justify-content-between">
                                             <div>Plants: <strong>2</strong></div>
-                                            <div>Status: <span id="kitchen-health" class="health-percentage neutral"></span></div>
+                                            <div>Status: <span id="kitchen-health" class="health-percentage neutral" data-room="kitchen"></span></div>
                                         </div>
                                     </div>
                                     <div class="plant-list">
                                         <div class="small-plant-item text-muted">
                                             <span class="plant-name">Herbs</span>
-                                            <span id="herb-overview-status" class="status-badge neutral"></span>
+                                            <span id="herb-overview-status" class="status-badge neutral" data-plant="herb" data-room="kitchen"></span>
                                             <span id="herb-health" class="health-percentage neutral"></span>
                                         </div>
                                         <div class="small-plant-item text-muted">
                                             <span class="plant-name">Mint</span>
-                                            <span id="mint-overview-status" class="status-badge neutral"></span>
+                                            <span id="mint-overview-status" class="status-badge neutral" data-plant="mint" data-room="kitchen"></span>
                                             <span id="mint-health" class="health-percentage neutral"></span>
                                         </div>
                                     </div>
@@ -111,18 +111,18 @@
                                     <div class="summary-stats mt-3 mb-3">
                                         <div class="d-flex justify-content-between">
                                             <div>Plants: <strong>2</strong></div>
-                                            <div>Status: <span id="bedroom-health" class="health-percentage neutral"></span></div>
+                                            <div>Status: <span id="bedroom-health" class="health-percentage neutral" data-room="bedroom"></span></div>
                                         </div>
                                     </div>
                                     <div class="plant-list">
                                         <div class="small-plant-item text-muted">
                                             <span class="plant-name">Ficus</span>
-                                            <span id="ficus-bedroom-status" class="status-badge neutral"></span>
+                                            <span id="ficus-bedroom-status" class="status-badge neutral" data-plant="ficus" data-room="bedroom"></span>
                                             <span id="ficus-bedroom-health" class="health-percentage neutral"></span>
                                         </div>
                                         <div class="small-plant-item text-muted">
                                             <span class="plant-name">Peace Lily</span>
-                                            <span id="lily-bedroom-status" class="status-badge neutral"></span>
+                                            <span id="lily-bedroom-status" class="status-badge neutral" data-plant="lily" data-room="bedroom"></span>
                                             <span id="lily-bedroom-health" class="health-percentage neutral"></span>
                                         </div>
                                     </div>
@@ -188,7 +188,7 @@
                                         <div class="env-icon">🌡️</div>
                                         <div class="env-details">
                                             <h5>Temperature</h5>
-                                            <p id="temperature-summary" class="neutral">Collecting data...</p>
+                                            <p id="temperature-summary" class="neutral" data-metric="temperature">Collecting data...</p>
                                         </div>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@
                                         <div class="env-icon">💧</div>
                                         <div class="env-details">
                                             <h5>Humidity</h5>
-                                            <p id="humidity-summary" class="neutral">Collecting data...</p>
+                                            <p id="humidity-summary" class="neutral" data-metric="humidity">Collecting data...</p>
                                         </div>
                                     </div>
                                 </div>
@@ -218,7 +218,7 @@
                                         <div class="env-icon">🌱</div>
                                         <div class="env-details">
                                             <h5>Soil Moisture</h5>
-                                            <p id="moisture-summary" class="neutral">Collecting data...</p>
+                                            <p id="moisture-summary" class="neutral" data-metric="moisture">Collecting data...</p>
                                         </div>
                                     </div>
                                 </div>

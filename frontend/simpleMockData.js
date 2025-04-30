@@ -1,481 +1,498 @@
-// simpleMockData.js - Simplified mock data for plant sensors
+// simpleMockData.js - Basic mock data system for plant monitoring dashboard
 
-// Mock data - represents data from sensors via InfluxDB
+/**
+ * Mock data for plants
+ */
 const plantData = {
     ficus: {
-        moisture: 45,  // %
-        temperature: 21.5, // °C
-        humidity: 35,  // %
-        light: 850     // lux
+        moisture: 45,
+        temperature: 30,
+        humidity: 35,
+        light: 850
     },
     lily: {
-        moisture: 70,  // %
-        temperature: 19, // °C
-        humidity: 65,  // %
-        light: 600     // lux
+        moisture: 70,
+        temperature: 19,
+        humidity: 65,
+        light: 600
     },
     cactus: {
-        moisture: 5,   // %
-        temperature: 25, // °C
-        humidity: 15,  // %
-        light: 1200    // lux
+        moisture: 5,
+        temperature: 25,
+        humidity: 15,
+        light: 1200
     },
     herb: {
-        moisture: 60,  // %
-        temperature: 22, // °C
-        humidity: 45,  // %
-        light: 900     // lux
+        moisture: 60,
+        temperature: 22,
+        humidity: 45,
+        light: 900
     },
     mint: {
-        moisture: 65,  // %
-        temperature: 20, // °C
-        humidity: 50,  // %
-        light: 700     // lux
+        moisture: 65,
+        temperature: 20,
+        humidity: 50,
+        light: 700
     }
 };
 
-// Track statuses for each plant metric to calculate overall health
+/**
+ * Thresholds for each plant type
+ */
+const thresholds = {
+    ficus: {
+        moisture: { min: 30, optimal: { min: 40, max: 60 }, max: 70 },
+        temperature: { min: 18, optimal: { min: 20, max: 25 }, max: 28 },
+        humidity: { min: 30, optimal: { min: 40, max: 50 }, max: 60 },
+        light: { min: 400, optimal: { min: 600, max: 1000 }, max: 1200 }
+    },
+    lily: {
+        moisture: { min: 50, optimal: { min: 60, max: 80 }, max: 90 },
+        temperature: { min: 16, optimal: { min: 18, max: 22 }, max: 26 },
+        humidity: { min: 40, optimal: { min: 50, max: 70 }, max: 80 },
+        light: { min: 300, optimal: { min: 400, max: 800 }, max: 1000 }
+    },
+    cactus: {
+        moisture: { min: 0, optimal: { min: 5, max: 30 }, max: 40 },
+        temperature: { min: 15, optimal: { min: 20, max: 30 }, max: 35 },
+        humidity: { min: 10, optimal: { min: 20, max: 30 }, max: 50 },
+        light: { min: 800, optimal: { min: 1000, max: 1800 }, max: 2000 }
+    },
+    herb: {
+        moisture: { min: 40, optimal: { min: 50, max: 70 }, max: 80 },
+        temperature: { min: 18, optimal: { min: 20, max: 24 }, max: 28 },
+        humidity: { min: 30, optimal: { min: 40, max: 60 }, max: 70 },
+        light: { min: 600, optimal: { min: 800, max: 1200 }, max: 1400 }
+    },
+    mint: {
+        moisture: { min: 50, optimal: { min: 60, max: 75 }, max: 85 },
+        temperature: { min: 15, optimal: { min: 18, max: 22 }, max: 25 },
+        humidity: { min: 40, optimal: { min: 50, max: 65 }, max: 75 },
+        light: { min: 500, optimal: { min: 600, max: 900 }, max: 1100 }
+    },
+    default: {
+        moisture: { min: 20, optimal: { min: 30, max: 70 }, max: 80 },
+        temperature: { min: 15, optimal: { min: 18, max: 26 }, max: 30 },
+        humidity: { min: 20, optimal: { min: 30, max: 70 }, max: 80 },
+        light: { min: 300, optimal: { min: 400, max: 1200 }, max: 1500 }
+    }
+};
+
+/**
+ * Room assignments for plants
+ */
+const roomAssignments = {
+    livingRoom: ['ficus', 'lily', 'cactus'],
+    kitchen: ['herb', 'mint'],
+    bedroom: ['ficus', 'lily']
+};
+
+/**
+ * Storage for calculated statuses
+ */
 const plantStatuses = {};
 
-// Update UI elements with data
+/**
+ * Main UI update function
+ */
 function updateUI() {
-    console.log("Updating UI with new data...");
-    
-    // Initialize plant statuses if needed
+    // Process all plants
     for (const plantId of Object.keys(plantData)) {
-        if (!plantStatuses[plantId]) {
-            plantStatuses[plantId] = {
-                moisture: 'neutral',
-                temperature: 'neutral',
-                humidity: 'neutral',
-                light: 'neutral'
-            };
-        }
+        updatePlantStatus(plantId, plantData[plantId]);
     }
     
-    // Loop through all plants
-    for (const [plantId, metrics] of Object.entries(plantData)) {
-        // Update each metric for the plant
-        for (const [metric, value] of Object.entries(metrics)) {
-            // Get status based on thresholds
-            const status = getMetricStatus(plantId, metric, value);
-            
-            // Store the status for overall calculation
-            plantStatuses[plantId][metric] = status;
-            
-            // Update plant metric displays
-            updatePlantMetric(plantId, metric, value, status);
-        }
-        
-        // Calculate and update overall plant health
-        updatePlantOverallHealth(plantId);
-    }
-    
-    // Update room summaries based on plant statuses
+    // Update room summaries
     updateRoomSummaries();
     
-    // Update date/time for last update
-    const lastUpdateElement = document.getElementById('last-update');
-    if (lastUpdateElement) {
-        lastUpdateElement.textContent = new Date().toLocaleTimeString();
-    }
+    // Update timestamp
+    document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
 }
 
-// Calculate and update the overall health score for a plant
-function updatePlantOverallHealth(plantId) {
-    // Skip if no status data for this plant
-    if (!plantStatuses[plantId]) return;
-    
-    // Calculate health score based on all metrics
-    // good = 100, warning = 50, bad = 0, neutral = not counted
-    let totalScore = 0;
-    let metricCount = 0;
-    
-    for (const [metric, status] of Object.entries(plantStatuses[plantId])) {
-        if (status === 'good') {
-            totalScore += 100;
-            metricCount++;
-        } else if (status === 'warning') {
-            totalScore += 50;
-            metricCount++;
-        } else if (status === 'bad') {
-            totalScore += 0;
-            metricCount++;
-        }
-        // Neutral values don't count
+/**
+ * Update plant status based on thresholds
+ */
+function updatePlantStatus(plantId, sensorData) {
+    if (!plantStatuses[plantId]) {
+        plantStatuses[plantId] = {};
     }
     
-    // Calculate average health score (0-100)
-    const healthScore = metricCount > 0 ? Math.round(totalScore / metricCount) : 0;
+    const plantThresholds = thresholds[plantId] || thresholds.default;
     
-    // Determine status based on health score
-    let overallStatus = 'neutral';
-    if (metricCount > 0) {
-        if (healthScore >= 80) {
-            overallStatus = 'good';
-        } else if (healthScore >= 40) {
-            overallStatus = 'warning';
-        } else {
-            overallStatus = 'bad';
-        }
-    }
-    
-    // Update plant overview status
-    updatePlantOverviewDisplay(plantId, healthScore, overallStatus);
-}
-
-// Update the overview display with health score
-function updatePlantOverviewDisplay(plantId, healthScore, status) {
-    // Find the overview status element for this plant
-    const overviewStatusElement = document.getElementById(`${plantId}-overview-status`);
-    if (overviewStatusElement) {
-        // Hide the status badge completely
-        overviewStatusElement.style.display = 'none';
-    }
-    
-    // Also hide bedroom status badges
-    const bedroomStatusElement = document.getElementById(`${plantId}-bedroom-status`);
-    if (bedroomStatusElement) {
-        bedroomStatusElement.style.display = 'none';
-    }
-    
-    // Find the health percentage element
-    const healthElement = document.getElementById(`${plantId}-health`);
-    if (healthElement) {
-        // Update the health percentage text
-        healthElement.textContent = `${healthScore}%`;
+    for (const [metric, value] of Object.entries(sensorData)) {
+        // Determine status
+        let status;
+        const limits = plantThresholds[metric];
         
-        // Update the status class for the health text
-        healthElement.classList.remove('good', 'warning', 'bad', 'neutral');
-        healthElement.classList.add(status);
+        if (!limits) {
+            status = 'neutral';
+        } else if (value < limits.min || value > limits.max) {
+            status = 'bad';
+        } else if (value >= limits.optimal.min && value <= limits.optimal.max) {
+            status = 'good';
+        } else {
+            status = 'warning';
+        }
+        
+        plantStatuses[plantId][metric] = { value, status };
+        
+        // Update UI for this metric
+        updateSingleMetricDisplay(plantId, metric, value, status);
     }
     
-    // Also handle bedroom variants
-    const bedroomHealthElement = document.getElementById(`${plantId}-bedroom-health`);
-    if (bedroomHealthElement) {
-        bedroomHealthElement.textContent = `${healthScore}%`;
-        bedroomHealthElement.classList.remove('good', 'warning', 'bad', 'neutral');
-        bedroomHealthElement.classList.add(status);
-    }
+    // Update plant overview
+    updatePlantOverview(plantId);
+    
+    // Update health percentage
+    updatePlantHealthPercentage(plantId);
 }
 
-// Update value and status for a specific plant metric
-function updatePlantMetric(plantId, metricType, value, status) {
-    // Find metric element if it exists
-    const metricElement = document.getElementById(`${plantId}-${metricType}-metric`);
+/**
+ * Update a single metric display
+ */
+function updateSingleMetricDisplay(plantId, metric, value, status) {
+    const metricElement = document.getElementById(`${plantId}-${metric}-metric`);
     if (!metricElement) return;
     
-    // Update styling for the element
+    // Update value display
+    const valueDisplay = metricElement.querySelector('.metric-value');
+    if (valueDisplay) {
+        let displayValue;
+        switch(metric) {
+            case 'moisture':
+            case 'humidity':
+                displayValue = `${value}%`;
+                break;
+            case 'temperature':
+                displayValue = `${value}°C`;
+                break;
+            case 'light':
+                displayValue = `${value} lux`;
+                break;
+            default:
+                displayValue = value;
+        }
+        valueDisplay.textContent = displayValue;
+    }
+    
+    // Update status styling
     metricElement.className = 'metric-status';
     metricElement.classList.add(status);
     
-    // Also update indicators in the header if they exist
-    updatePlantIndicator(plantId, metricType, status);
-}
-
-// Update room summaries based on plant statuses
-function updateRoomSummaries() {
-    // Living room plants
-    const livingRoomPlants = ['ficus', 'lily', 'cactus'];
-    updateRoomStatusSummary('livingroom', livingRoomPlants);
-    
-    // Kitchen plants
-    const kitchenPlants = ['herb', 'mint'];
-    updateRoomStatusSummary('kitchen', kitchenPlants);
-    
-    // Bedroom plants
-    const bedroomPlants = ['ficus', 'lily'];
-    updateRoomStatusSummary('bedroom', bedroomPlants);
-}
-
-// Update room status summary
-function updateRoomStatusSummary(roomId, plantIds) {
-    const roomHealthElement = document.getElementById(`${roomId}-health`);
-    if (!roomHealthElement) return;
-    
-    // Collect health scores from all plants in this room
-    let totalHealthScore = 0;
-    let plantCount = 0;
-    
-    plantIds.forEach(plantId => {
-        const healthElement = document.getElementById(`${plantId}-health`) || 
-                               document.getElementById(`${plantId}-bedroom-health`);
-        
-        if (healthElement && healthElement.textContent) {
-            // Parse the percentage value
-            const healthScore = parseInt(healthElement.textContent.replace('%', ''));
-            if (!isNaN(healthScore)) {
-                totalHealthScore += healthScore;
-                plantCount++;
-            }
-        }
-    });
-    
-    // Calculate average health score for the room
-    const avgHealthScore = plantCount > 0 ? Math.round(totalHealthScore / plantCount) : 0;
-    
-    // Determine room status based on average health score
-    let overallStatus = 'neutral';
-    if (plantCount > 0) {
-        if (avgHealthScore >= 80) {
-            overallStatus = 'good';
-        } else if (avgHealthScore >= 40) {
-            overallStatus = 'warning';
-        } else {
-            overallStatus = 'bad';
-        }
+    // Update status icon
+    const statusIcon = metricElement.querySelector('.status-icon');
+    if (statusIcon) {
+        statusIcon.className = 'status-icon';
+        statusIcon.classList.add(status);
     }
     
-    // Update room health display
-    roomHealthElement.textContent = `${avgHealthScore}%`;
-    roomHealthElement.classList.remove('good', 'warning', 'bad', 'neutral');
-    roomHealthElement.classList.add(overallStatus);
+    // Update indicator in header
+    updatePlantHeaderIndicator(plantId, metric, status);
 }
 
-// Update indicator in plant header
-function updatePlantIndicator(plantId, metricType, status) {
-    // Find all plant headers that match this plant
+/**
+ * Update plant header indicator
+ */
+function updatePlantHeaderIndicator(plantId, metric, status) {
     document.querySelectorAll('.plant-header').forEach(header => {
         const plantNameElement = header.querySelector('.plant-name');
-        if (plantNameElement && plantNameElement.textContent.toLowerCase().includes(plantId.toLowerCase())) {
-            // Find the indicator for this metric
+        if (plantNameElement && plantNameElement.textContent.toLowerCase().includes(plantId)) {
             header.querySelectorAll('.indicator-item').forEach(indicator => {
-                if (indicator.getAttribute('title') && 
-                    indicator.getAttribute('title').toLowerCase() === metricType.toLowerCase()) {
-                    // Update status class
-                    indicator.classList.remove('good', 'warning', 'bad', 'neutral');
+                if (indicator.getAttribute('data-metric') === metric) {
+                    indicator.className = 'indicator-item';
                     indicator.classList.add(status);
-                    
-                    // Remove emoji from indicator
-                    const spanElement = indicator.querySelector('span');
-                    if (spanElement) {
-                        // Keep text based on metric type
-                        if (metricType === 'moisture') {
-                            spanElement.textContent = 'M';
-                        } else if (metricType === 'temperature') {
-                            spanElement.textContent = 'T';
-                        } else if (metricType === 'humidity') {
-                            spanElement.textContent = 'H';
-                        } else if (metricType === 'light') {
-                            spanElement.textContent = 'L';
-                        }
-                    }
-                }
-                
-                // Remove happiness emoji and heart
-                if (indicator.getAttribute('title') === 'Happiness' || 
-                    indicator.getAttribute('title') === 'Overall Health') {
-                    indicator.style.display = 'none';
                 }
             });
             
-            // Update health percentage in plant detail view
-            if (plantId === 'ficus') {
-                updateDetailHealth('ficus-detail-health', plantStatuses[plantId]);
-                updateDetailHealth('ficus-detail-bedroom-health', plantStatuses[plantId]);
-            } else if (plantId === 'lily') {
-                updateDetailHealth('lily-detail-health', plantStatuses[plantId]);
-                updateDetailHealth('lily-detail-bedroom-health', plantStatuses[plantId]);
-            } else if (plantId === 'cactus') {
-                updateDetailHealth('cactus-detail-health', plantStatuses[plantId]);
-            } else if (plantId === 'herb') {
-                updateDetailHealth('herb-detail-health', plantStatuses[plantId]);
-            } else if (plantId === 'mint') {
-                updateDetailHealth('mint-detail-health', plantStatuses[plantId]);
-            }
+            // Update happiness indicator
+            updatePlantHappinessIndicator(header, plantId);
         }
     });
 }
 
-// Update health percentage text in detail view
-function updateDetailHealth(elementId, plantStatus) {
-    const healthElement = document.getElementById(elementId);
-    if (!healthElement) return;
+/**
+ * Update happiness indicator
+ */
+function updatePlantHappinessIndicator(header, plantId) {
+    if (!plantStatuses[plantId]) return;
     
-    // Calculate health percentage
-    let totalScore = 0;
-    let metricCount = 0;
+    const happinessIndicator = Array.from(header.querySelectorAll('.indicator-item')).find(
+        indicator => indicator.getAttribute('title') === 'Happiness'
+    );
     
-    for (const [metric, status] of Object.entries(plantStatus)) {
-        if (status === 'good') {
-            totalScore += 100;
-            metricCount++;
-        } else if (status === 'warning') {
-            totalScore += 50;
-            metricCount++;
-        } else if (status === 'bad') {
-            totalScore += 0;
-            metricCount++;
-        }
+    if (!happinessIndicator) return;
+    
+    // Count issues
+    let warningCount = 0;
+    let badCount = 0;
+    
+    for (const [metric, data] of Object.entries(plantStatuses[plantId])) {
+        if (data.status === 'warning') warningCount++;
+        if (data.status === 'bad') badCount++;
     }
     
-    const healthScore = metricCount > 0 ? Math.round(totalScore / metricCount) : 0;
-    
-    // Determine status based on health score
-    let overallStatus = 'neutral';
-    if (metricCount > 0) {
-        if (healthScore >= 80) {
-            overallStatus = 'good';
-        } else if (healthScore >= 40) {
-            overallStatus = 'warning';
-        } else {
-            overallStatus = 'bad';
-        }
-    }
-    
-    // Update health text and status
-    healthElement.textContent = `${healthScore}%`;
-    healthElement.classList.remove('good', 'warning', 'bad', 'neutral');
-    healthElement.classList.add(overallStatus);
-}
-
-// Find the correct status for a metric value based on plant thresholds
-function getMetricStatus(plantId, metricType, value) {
-    // Use simple threshold logic
-    const thresholds = getThresholds(plantId, metricType);
-    
-    if (value < thresholds.min || value > thresholds.max) {
-        return 'bad';  // Critical value
-    } else if (value < thresholds.lowWarning || value > thresholds.highWarning) {
-        return 'warning';  // Warning value
+    // Set happiness
+    const iconElement = happinessIndicator.querySelector('span');
+    if (badCount > 0) {
+        happinessIndicator.className = 'indicator-item bad';
+        if (iconElement) iconElement.textContent = '😢';
+    } else if (warningCount > 0) {
+        happinessIndicator.className = 'indicator-item warning';
+        if (iconElement) iconElement.textContent = '😐';
     } else {
-        return 'good';  // Optimal value
+        happinessIndicator.className = 'indicator-item good';
+        if (iconElement) iconElement.textContent = '😊';
     }
 }
 
-// Get thresholds for a specific plant type and metric
-function getThresholds(plantId, metricType) {
-    // Default values if not otherwise defined
-    const defaultThresholds = {
-        moisture: { min: 20, max: 80, lowWarning: 30, highWarning: 70 },
-        temperature: { min: 15, max: 30, lowWarning: 18, highWarning: 26 },
-        humidity: { min: 20, max: 80, lowWarning: 30, highWarning: 70 },
-        light: { min: 300, max: 1500, lowWarning: 400, highWarning: 1200 }
-    };
+/**
+ * Update plant overview
+ */
+function updatePlantOverview(plantId) {
+    const overviewElement = document.getElementById(`${plantId}-overview`);
+    if (!overviewElement) return;
     
-    // Plant-specific thresholds
-    const plantThresholds = {
-        ficus: {
-            moisture: { min: 30, max: 70, lowWarning: 40, highWarning: 60 },
-            humidity: { min: 30, max: 60, lowWarning: 40, highWarning: 50 }
-        },
-        lily: {
-            moisture: { min: 50, max: 90, lowWarning: 60, highWarning: 80 },
-            humidity: { min: 40, max: 80, lowWarning: 50, highWarning: 70 }
-        },
-        cactus: {
-            moisture: { min: 0, max: 40, lowWarning: 5, highWarning: 30 },
-            humidity: { min: 10, max: 50, lowWarning: 20, highWarning: 30 }
+    const metrics = ['moisture', 'temperature', 'humidity', 'light'];
+    let warningCount = 0;
+    let badCount = 0;
+    
+    metrics.forEach(metric => {
+        if (plantStatuses[plantId] && plantStatuses[plantId][metric]) {
+            const { status } = plantStatuses[plantId][metric];
+            
+            if (status === 'warning') warningCount++;
+            if (status === 'bad') badCount++;
+            
+            const indicatorElement = overviewElement.querySelector(`.plant-overview-${metric}`);
+            if (indicatorElement) {
+                indicatorElement.className = `plant-overview-${metric}`;
+                indicatorElement.classList.add(status);
+            }
         }
-    };
+    });
     
-    // Return plant-specific values if they exist, otherwise default values
-    if (plantThresholds[plantId] && plantThresholds[plantId][metricType]) {
-        return plantThresholds[plantId][metricType];
+    // Update overall status
+    const statusTextElement = overviewElement.querySelector('.plant-status-text');
+    if (statusTextElement) {
+        if (badCount > 0) {
+            statusTextElement.textContent = 'Needs immediate attention!';
+            statusTextElement.className = 'plant-status-text bad';
+        } else if (warningCount > 0) {
+            statusTextElement.textContent = 'Needs attention soon';
+            statusTextElement.className = 'plant-status-text warning';
+        } else {
+            statusTextElement.textContent = 'All metrics optimal';
+            statusTextElement.className = 'plant-status-text good';
+        }
     }
     
-    return defaultThresholds[metricType] || { min: 0, max: 100, lowWarning: 20, highWarning: 80 };
+    // Update status badges
+    updatePlantOverviewStatusBadge(plantId, badCount, warningCount);
 }
 
-// Simulate sensor changes with random values
-function simulateRandomChanges() {
-    // Choose a random plant
-    const plants = Object.keys(plantData);
-    const randomPlant = plants[Math.floor(Math.random() * plants.length)];
+/**
+ * Update status badges in overview
+ */
+function updatePlantOverviewStatusBadge(plantId, badCount, warningCount) {
+    document.querySelectorAll(`[id^="${plantId}-overview-status"]`).forEach(badge => {
+        if (badCount > 0) {
+            badge.className = 'status-badge bad';
+            badge.textContent = '⚠️';
+        } else if (warningCount > 0) {
+            badge.className = 'status-badge warning';
+            badge.textContent = '⚠️';
+        } else {
+            badge.className = 'status-badge good';
+            badge.textContent = '✓';
+        }
+    });
+}
+
+/**
+ * Update plant health percentage
+ */
+function updatePlantHealthPercentage(plantId) {
+    if (!plantStatuses[plantId]) return;
     
-    // Choose a random metric
-    const metrics = Object.keys(plantData[randomPlant]);
-    const randomMetric = metrics[Math.floor(Math.random() * metrics.length)];
+    let totalMetrics = 0;
+    let healthScore = 0;
     
-    // Current value
-    const currentValue = plantData[randomPlant][randomMetric];
-    
-    // Generate random change based on metric type
-    let change;
-    switch(randomMetric) {
-        case 'moisture':
-            change = Math.random() * 10 - 5; // -5 to +5
-            break;
-        case 'temperature':
-            change = Math.random() * 2 - 1; // -1 to +1
-            break;
-        case 'humidity':
-            change = Math.random() * 6 - 3; // -3 to +3
-            break;
-        case 'light':
-            change = Math.random() * 200 - 100; // -100 to +100
-            break;
-        default:
-            change = 0;
+    for (const [metric, data] of Object.entries(plantStatuses[plantId])) {
+        totalMetrics++;
+        
+        switch(data.status) {
+            case 'good': healthScore += 100; break;
+            case 'warning': healthScore += 50; break;
+            case 'bad': healthScore += 0; break;
+            default: totalMetrics--; break; // Don't count neutral
+        }
     }
     
-    // Calculate new value and set bounds
-    let newValue = currentValue + change;
+    const healthPercentage = totalMetrics > 0 ? Math.round(healthScore / totalMetrics) : 0;
     
-    // Ensure values remain within reasonable limits
-    switch(randomMetric) {
-        case 'moisture':
-            newValue = Math.max(0, Math.min(100, newValue));
-            break;
-        case 'temperature':
-            newValue = Math.max(10, Math.min(35, newValue));
-            break;
-        case 'humidity':
-            newValue = Math.max(5, Math.min(95, newValue));
-            break;
-        case 'light':
-            newValue = Math.max(0, Math.min(2000, newValue));
-            break;
+    let statusClass;
+    if (healthPercentage >= 80) {
+        statusClass = 'good';
+    } else if (healthPercentage >= 40) {
+        statusClass = 'warning';
+    } else {
+        statusClass = 'bad';
     }
     
-    // Update data
-    plantData[randomPlant][randomMetric] = parseFloat(newValue.toFixed(1));
+    // Update displays
+    document.querySelectorAll(`[id^="${plantId}-health"]`).forEach(element => {
+        element.textContent = `${healthPercentage}%`;
+        element.className = 'health-percentage';
+        element.classList.add(statusClass);
+    });
+}
+
+/**
+ * Update room summaries
+ */
+function updateRoomSummaries() {
+    for (const [roomId, plants] of Object.entries(roomAssignments)) {
+        updateRoomStatusSummary(roomId, plants);
+    }
     
-    console.log(`Updated ${randomPlant} ${randomMetric}: ${currentValue} -> ${plantData[randomPlant][randomMetric]}`);
+    updateEnvironmentalSummaries();
+}
+
+/**
+ * Update room status summary
+ */
+function updateRoomStatusSummary(roomId, plantIds) {
+    const roomStatusElement = document.getElementById(`${roomId}-status`);
+    if (!roomStatusElement) return;
     
-    // Update UI
+    let totalWarnings = 0;
+    let totalCritical = 0;
+    let plantsWithData = 0;
+    
+    plantIds.forEach(plantId => {
+        if (plantStatuses[plantId]) {
+            plantsWithData++;
+            
+            for (const [metric, data] of Object.entries(plantStatuses[plantId])) {
+                if (data.status === 'warning') totalWarnings++;
+                if (data.status === 'bad') totalCritical++;
+            }
+        }
+    });
+    
+    let roomStatus = 'neutral';
+    let statusText = 'No data available';
+    
+    if (plantsWithData > 0) {
+        if (totalCritical > 0) {
+            roomStatus = 'bad';
+            statusText = 'Plants need immediate attention!';
+        } else if (totalWarnings > 0) {
+            roomStatus = 'warning';
+            statusText = 'Some plants need attention soon';
+        } else {
+            roomStatus = 'good';
+            statusText = 'All plants healthy';
+        }
+    }
+    
+    roomStatusElement.className = 'room-status';
+    roomStatusElement.classList.add(roomStatus);
+    roomStatusElement.textContent = statusText;
+}
+
+/**
+ * Update environmental summaries
+ */
+function updateEnvironmentalSummaries() {
+    const metrics = ['temperature', 'humidity', 'moisture', 'light'];
+    
+    metrics.forEach(metric => {
+        const values = [];
+        
+        for (const plantId of Object.keys(plantData)) {
+            if (plantData[plantId][metric]) {
+                values.push(plantData[plantId][metric]);
+            }
+        }
+        
+        if (values.length > 0) {
+            const average = values.reduce((sum, val) => sum + val, 0) / values.length;
+            updateEnvironmentalSummary(metric, average);
+        }
+    });
+}
+
+/**
+ * Update specific environmental summary
+ */
+function updateEnvironmentalSummary(metric, value) {
+    document.querySelectorAll(`#${metric}-summary`).forEach(element => {
+        let displayText;
+        switch(metric) {
+            case 'temperature':
+                displayText = `Average: ${value.toFixed(1)}°C`;
+                break;
+            case 'humidity':
+            case 'moisture':
+                displayText = `Average: ${value.toFixed(0)}%`;
+                break;
+            case 'light':
+                displayText = `Average: ${value.toFixed(0)} lux`;
+                break;
+            default:
+                displayText = `Average: ${value}`;
+        }
+        
+        element.textContent = displayText;
+    });
+}
+
+/**
+ * Toggle panel visibility
+ */
+function togglePanel(targetId) {
+    const target = document.querySelector(targetId);
+    if (!target) return;
+    
+    if (target.style.display === 'none' || target.style.display === '') {
+        target.style.display = 'block';
+        const toggleElement = document.querySelector(`[data-toggle-target="${targetId}"] .toggle-icon span`);
+        if (toggleElement) toggleElement.textContent = '⌃';
+    } else {
+        target.style.display = 'none';
+        const toggleElement = document.querySelector(`[data-toggle-target="${targetId}"] .toggle-icon span`);
+        if (toggleElement) toggleElement.textContent = '⌄';
+    }
+}
+
+/**
+ * Manual update function - call after changing plantData
+ */
+function updatePlantDataUI() {
     updateUI();
 }
 
-// Initialize at page load
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Initializing plant monitoring dashboard...");
     
-    // First UI update
+    // Update UI with initial data
     updateUI();
     
-    // Start periodic updates every 5 seconds
-    setInterval(simulateRandomChanges, 5000);
-    
-    // Set toggle function for plant details if not already defined
-    if (typeof toggleDetails !== 'function') {
-        // Add click events to all toggleable panels
-        document.querySelectorAll('.card-header[data-toggle-target]').forEach(header => {
-            header.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-toggle-target');
-                const target = document.querySelector(targetId);
-                
-                if (target) {
-                    if (target.style.display === 'none' || target.style.display === '') {
-                        target.style.display = 'block';
-                        const icon = this.querySelector('.toggle-icon span');
-                        if (icon) icon.textContent = '⌃';
-                    } else {
-                        target.style.display = 'none';
-                        const icon = this.querySelector('.toggle-icon span');
-                        if (icon) icon.textContent = '⌄';
-                    }
-                }
-            });
+    // Add click handlers for expandable panels
+    document.querySelectorAll('.card-header[data-toggle-target]').forEach(header => {
+        header.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-toggle-target');
+            togglePanel(targetId);
         });
-    }
+    });
     
     // Set initial state for collapsible panels
     document.querySelectorAll('.collapse').forEach(panel => {
         if (panel.id === 'ficusDetails' || panel.id === 'herbDetails') {
-            panel.style.display = 'block'; // First panel open by default
+            panel.style.display = 'block'; // First panels open by default
         } else {
-            panel.style.display = 'none';  // Other panels closed
+            panel.style.display = 'none';  // Other panels closed by default
         }
     });
 });
