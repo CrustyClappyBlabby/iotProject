@@ -270,35 +270,9 @@ body {
     font-size: 0.9rem;
 }
 
-/* Status badges for overview */
+/* Status badges for overview - hidden by default */
 .status-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    font-size: 14px;
-}
-
-.status-badge.good {
-    background-color: var(--good-color);
-    color: white;
-}
-
-.status-badge.warning {
-    background-color: var(--warning-color);
-    color: #212529;
-}
-
-.status-badge.bad {
-    background-color: var(--bad-color);
-    color: white;
-}
-
-.status-badge.neutral {
-    background-color: var(--neutral-color);
-    color: white;
+    display: none;
 }
 
 /* Health percentage text styling */
@@ -327,11 +301,10 @@ body {
 
 /* Style for health percentages in overview */
 .small-plant-item .health-percentage {
-    background-color: rgba(255, 255, 255, 0.7);
     padding: 0 6px;
-    border-radius: 4px;
     position: absolute;
     right: 15px;
+    font-weight: bold;
 }
 
 /* Make plant items relative for positioning */

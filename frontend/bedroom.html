@@ -100,7 +100,7 @@
                     <div class="plant-section">
                         <!-- Plant 1: Ficus -->
                         <div class="card plant-card shadow-sm mb-4">
-                            <div class="card-header plant-header" data-toggle-target="#ficusDetails">
+                            <div class="card-header plant-header" data-toggle-target="#ficusDetails" onclick="togglePanel('#ficusDetails', this); return false;">
                                 <div class="plant-name">Ficus</div>
                                 <span id="ficus-detail-bedroom-health" class="health-percentage neutral ms-2"></span>
                                 <div class="plant-indicators">
@@ -224,7 +224,7 @@
                         
                         <!-- Plant 2: Peace Lily -->
                         <div class="card plant-card shadow-sm mb-4">
-                            <div class="card-header plant-header" data-toggle-target="#lilyDetails">
+                            <div class="card-header plant-header" data-toggle-target="#lilyDetails" onclick="togglePanel('#lilyDetails', this); return false;">
                                 <div class="plant-name">Peace Lily</div>
                                 <span id="lily-detail-bedroom-health" class="health-percentage neutral ms-2"></span>
                                 <div class="plant-indicators">
@@ -352,10 +352,33 @@
         </div>
     </div>
 
+    <!-- jQuery first (for panel functionality) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Application JavaScript -->
     <script src="simpleMockData.js"></script>
+    
+    <!-- Panel toggling script -->
+    <script>
+    $(document).ready(function() {
+        // Panel toggling is now handled via inline onclick handlers
+        
+        // Initialize panels on page load
+        $('.collapse').each(function() {
+            const $panel = $(this);
+            if ($panel.hasClass('show')) {
+                $panel.show();
+                const panelId = $panel.attr('id');
+                const $header = $(`[data-toggle-target="#${panelId}"]`);
+                $header.find('.toggle-icon span').text('⌃');
+            } else {
+                $panel.hide();
+            }
+        });
+    });
+    </script>
 </body>
 </html>

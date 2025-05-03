@@ -6,7 +6,7 @@
 const plantData = {
     ficus: {
         moisture: 45,
-        temperature: 30,
+        temperature: 22,
         humidity: 35,
         light: 850
     },
@@ -105,7 +105,10 @@ function updateUI() {
     updateRoomSummaries();
     
     // Update timestamp
-    document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+    const lastUpdateElement = document.getElementById('last-update');
+    if (lastUpdateElement) {
+        lastUpdateElement.textContent = new Date().toLocaleTimeString();
+    }
 }
 
 /**
@@ -290,21 +293,10 @@ function updatePlantOverview(plantId) {
 }
 
 /**
- * Update status badges in overview
+ * Update status badges in overview - badge display disabled
  */
 function updatePlantOverviewStatusBadge(plantId, badCount, warningCount) {
-    document.querySelectorAll(`[id^="${plantId}-overview-status"]`).forEach(badge => {
-        if (badCount > 0) {
-            badge.className = 'status-badge bad';
-            badge.textContent = '⚠️';
-        } else if (warningCount > 0) {
-            badge.className = 'status-badge warning';
-            badge.textContent = '⚠️';
-        } else {
-            badge.className = 'status-badge good';
-            badge.textContent = '✓';
-        }
-    });
+    // Do nothing - badges are hidden via CSS
 }
 
 /**
@@ -448,21 +440,38 @@ function updateEnvironmentalSummary(metric, value) {
 }
 
 /**
- * Toggle panel visibility
+ * Toggle panel visibility - refined implementation
  */
-function togglePanel(targetId) {
-    const target = document.querySelector(targetId);
-    if (!target) return;
-    
-    if (target.style.display === 'none' || target.style.display === '') {
-        target.style.display = 'block';
-        const toggleElement = document.querySelector(`[data-toggle-target="${targetId}"] .toggle-icon span`);
-        if (toggleElement) toggleElement.textContent = '⌃';
-    } else {
-        target.style.display = 'none';
-        const toggleElement = document.querySelector(`[data-toggle-target="${targetId}"] .toggle-icon span`);
-        if (toggleElement) toggleElement.textContent = '⌄';
+function togglePanel(targetId, headerElement) {
+    // Ensure headerElement is provided (the header that was clicked)
+    if (!headerElement) {
+        console.error("Header element not provided for toggle");
+        return;
     }
+    
+    // Find the target panel
+    const target = document.querySelector(targetId);
+    if (!target) {
+        console.error("Target panel not found:", targetId);
+        return;
+    }
+    
+    // Find the toggle icon
+    const toggleIcon = headerElement.querySelector('.toggle-icon span');
+    
+    // Toggle display with animation
+    if (target.style.display === 'none' || target.style.display === '') {
+        // Show panel
+        $(target).slideDown(200);
+        if (toggleIcon) toggleIcon.textContent = '⌃';
+    } else {
+        // Hide panel
+        $(target).slideUp(200);
+        if (toggleIcon) toggleIcon.textContent = '⌄';
+    }
+    
+    // Prevent event bubbling
+    return false;
 }
 
 /**
@@ -480,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateUI();
     
     // Add click handlers for expandable panels
-    document.querySelectorAll('.card-header[data-toggle-target]').forEach(header => {
+    document.querySelectorAll('.plant-header[data-toggle-target]').forEach(header => {
         header.addEventListener('click', function() {
             const targetId = this.getAttribute('data-toggle-target');
             togglePanel(targetId);
