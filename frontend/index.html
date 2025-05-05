@@ -135,44 +135,28 @@
                         </div>
                     </div>
 
-                    <!-- Health Calculation Explanation -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-body d-flex justify-content-between align-items-center">
-                                    <span>Plant health percentages indicate overall sensor status</span>
-                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#healthCalcModal">
-                                        <i class="bi bi-question-circle"></i> More Info
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Health Calculation Info Box -->
+                    <div class="info-toggle-container text-center mb-4 mt-3">
+                        <button class="btn btn-sm btn-outline-info info-button" type="button" data-target="#healthInfoCollapse">
+                            <i class="bi bi-info-circle"></i> How is plant health calculated?
+                        </button>
                     </div>
-                    
-                    <!-- Health Calculation Modal -->
-                    <div class="modal fade" id="healthCalcModal" tabindex="-1" aria-labelledby="healthCalcModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="healthCalcModalLabel">Plant Health Calculation</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <div class="health-calculation-info">
-                                <p>The health percentage is calculated based on the status of each plant's sensors:</p>
+                    <div class="collapse" id="healthInfoCollapse">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Plant Health Percentage - How is it calculated?</h5>
+                                <p>The percentage value for each plant is calculated based on four measured parameters: moisture, temperature, light, and humidity.</p>
                                 <ul>
-                                    <li><strong>Good status:</strong> 100%</li>
-                                    <li><strong>Warning status:</strong> 50%</li>
-                                    <li><strong>Bad status:</strong> 0%</li>
+                                    <li><strong>Optimal value (100%):</strong> Parameter is within the plant's optimal range</li>
+                                    <li><strong>Warning (50%):</strong> Parameter is between the optimal range and min/max limits</li>
+                                    <li><strong>Critical (0%):</strong> Parameter is below minimum or above maximum threshold</li>
                                 </ul>
-                                <p>The overall health is the average of all sensor readings. A score of 80-100% is considered good (green), 40-79% is a warning (yellow), and below 40% indicates poor health (red).</p>
+                                <p>The overall percentage is the average of all four parameters, and the color indicates the plant's general condition:<br>
+                                <span class="badge bg-success">Green (≥80%)</span> 
+                                <span class="badge bg-warning">Yellow (40-79%)</span> 
+                                <span class="badge bg-danger">Red (≤39%)</span></p>
                             </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          </div>
                         </div>
-                      </div>
                     </div>
                     
                     <!-- Environmental Summary -->

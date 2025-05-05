@@ -262,38 +262,12 @@ function updatePlantHeaderIndicator(plantId, metric, status) {
 }
 
 /**
- * Update happiness indicator
+ * Update happiness indicator - now evaluates only overall percentage
  */
 function updatePlantHappinessIndicator(header, plantId) {
-    if (!plantStatuses[plantId]) return;
-    
-    const happinessIndicator = Array.from(header.querySelectorAll('.indicator-item')).find(
-        indicator => indicator.getAttribute('title') === 'Happiness'
-    );
-    
-    if (!happinessIndicator) return;
-    
-    // Count issues
-    let warningCount = 0;
-    let badCount = 0;
-    
-    for (const [metric, data] of Object.entries(plantStatuses[plantId])) {
-        if (data.status === 'warning') warningCount++;
-        if (data.status === 'bad') badCount++;
-    }
-    
-    // Set happiness
-    const iconElement = happinessIndicator.querySelector('span');
-    if (badCount > 0) {
-        happinessIndicator.className = 'indicator-item bad';
-        if (iconElement) iconElement.textContent = '😢';
-    } else if (warningCount > 0) {
-        happinessIndicator.className = 'indicator-item warning';
-        if (iconElement) iconElement.textContent = '😐';
-    } else {
-        happinessIndicator.className = 'indicator-item good';
-        if (iconElement) iconElement.textContent = '😊';
-    }
+    // This function is no longer needed since we removed happiness indicators
+    // But we'll keep the function to avoid breaking any existing code
+    return;
 }
 
 /**
@@ -357,7 +331,8 @@ function updatePlantOverviewStatusBadge(plantId, badCount, warningCount) {
 }
 
 /**
- * Update plant health percentage
+ * Update plant health percentage 
+ * This is the only place where thresholds are evaluated now
  */
 function updatePlantHealthPercentage(plantId) {
     if (!plantStatuses[plantId]) return;
@@ -401,7 +376,7 @@ function updatePlantHealthDisplays(plantId, healthPercentage, statusClass) {
         .map(([roomId, _]) => roomId);
     
     // Standard health display format (used in most places)
-    document.querySelectorAll(`[id^="${plantId}-health"]`).forEach(element => {
+    document.querySelectorAll(`[id^="${plantId}-"][id$="health"]`).forEach(element => {
         element.textContent = `${healthPercentage}%`;
         element.className = 'health-percentage';
         element.classList.add(statusClass);
@@ -604,31 +579,46 @@ function updateEnvironmentalSummary(metric, value, roomId) {
  * Toggle panel visibility - refined implementation
  */
 function togglePanel(targetId, headerElement) {
-    // Ensure headerElement is provided (the header that was clicked)
+    // Remove console logging for production
+    // console.log("togglePanel called with", targetId, headerElement);
+    
+    // Ensure a valid target is provided
+    if (typeof targetId !== 'string') {
+        console.error("Invalid targetId:", targetId);
+        return false;
+    }
+
+    // If headerElement is not provided, try to find it from the targetId
     if (!headerElement) {
-        console.error("Header element not provided for toggle");
-        return;
+        headerElement = document.querySelector(`[data-toggle-target="${targetId}"]`);
+        if (!headerElement) {
+            console.error("Header element not found for target:", targetId);
+            return false;
+        }
     }
     
     // Find the target panel
     const target = document.querySelector(targetId);
     if (!target) {
         console.error("Target panel not found:", targetId);
-        return;
+        return false;
     }
     
     // Find the toggle icon
     const toggleIcon = headerElement.querySelector('.toggle-icon span');
     
+    // Check the panel's current state
+    const isPanelVisible = !(target.style.display === 'none' || target.style.display === '');
+    
     // Toggle display with animation
-    if (target.style.display === 'none' || target.style.display === '') {
-        // Show panel
-        $(target).slideDown(200);
-        if (toggleIcon) toggleIcon.textContent = '⌃';
-    } else {
-        // Hide panel
+    if (isPanelVisible) {
+        // Panel is visible, so hide it
         $(target).slideUp(200);
         if (toggleIcon) toggleIcon.textContent = '⌄';
+    } else {
+        // Panel is hidden, so show it
+        $(target).slideDown(200);
+        if (toggleIcon) toggleIcon.textContent = '⌃';
     }
     
     // Prevent event bubbling
@@ -649,11 +639,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update UI with initial data
     updateUI();
     
-    // Add click handlers for expandable panels
-    document.querySelectorAll('.plant-header[data-toggle-target]').forEach(header => {
-        header.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-toggle-target');
-            togglePanel(targetId);
+    // No need for additional click handlers for plant headers since they use inline onclick
+    
+    // Add click handlers for info buttons
+    document.querySelectorAll('.info-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const target = document.querySelector(targetId);
+            if (target) {
+                if (target.style.display === 'none' || target.style.display === '') {
+                    $(target).slideDown(200);
+                } else {
+                    $(target).slideUp(200);
+                }
+            }
         });
     });
     

@@ -110,9 +110,6 @@
                                     <div class="indicator-item neutral" title="Moisture" data-metric="moisture" data-plant="ficus" data-room="livingRoom">
                                         <span>💧</span>
                                     </div>
-                                    <div class="indicator-item neutral" title="Happiness">
-                                        <span>😐</span>
-                                    </div>
                                     <div class="indicator-item neutral" title="Humidity" data-metric="humidity" data-plant="ficus" data-room="livingRoom">
                                         <span>💦</span>
                                     </div>
@@ -233,9 +230,6 @@
                                 <div class="plant-indicators">
                                     <div class="indicator-item neutral" title="Moisture" data-metric="moisture" data-plant="lily" data-room="livingRoom">
                                         <span>💧</span>
-                                    </div>
-                                    <div class="indicator-item neutral" title="Happiness">
-                                        <span>😐</span>
                                     </div>
                                     <div class="indicator-item neutral" title="Humidity" data-metric="humidity" data-plant="lily" data-room="livingRoom">
                                         <span>💦</span>
@@ -358,9 +352,6 @@
                                     <div class="indicator-item neutral" title="Moisture" data-metric="moisture" data-plant="cactus" data-room="livingRoom">
                                         <span>💧</span>
                                     </div>
-                                    <div class="indicator-item neutral" title="Happiness">
-                                        <span>😐</span>
-                                    </div>
                                     <div class="indicator-item neutral" title="Humidity" data-metric="humidity" data-plant="cactus" data-room="livingRoom">
                                         <span>💦</span>
                                     </div>
@@ -473,6 +464,31 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Health Calculation Info Box -->
+                    <div class="info-toggle-container text-center mb-3 mt-4">
+                        <button class="btn btn-sm btn-outline-info info-button" type="button" data-target="#healthInfoCollapse">
+                            <i class="bi bi-info-circle"></i> How is plant health calculated?
+                        </button>
+                    </div>
+                    <div class="collapse" id="healthInfoCollapse">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Plant Health Percentage - How is it calculated?</h5>
+                                <p>The percentage value for each plant is calculated based on four measured parameters: moisture, temperature, light, and humidity.</p>
+                                <ul>
+                                    <li><strong>Optimal value (100%):</strong> Parameter is within the plant's optimal range</li>
+                                    <li><strong>Warning (50%):</strong> Parameter is between the optimal range and min/max limits</li>
+                                    <li><strong>Critical (0%):</strong> Parameter is below minimum or above maximum threshold</li>
+                                </ul>
+                                <p>The overall percentage is the average of all four parameters, and the color indicates the plant's general condition:<br>
+                                <span class="badge bg-success">Green (≥80%)</span> 
+                                <span class="badge bg-warning">Yellow (40-79%)</span> 
+                                <span class="badge bg-danger">Red (≤39%)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
