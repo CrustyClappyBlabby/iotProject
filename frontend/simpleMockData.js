@@ -5,34 +5,34 @@
  */
 const plantData = {
     ficus: {
-        moisture: 45,
-        temperature: 22,
-        humidity: 35,
-        light: 850
+        moisture: 72.5,
+        temperature: 24.5,
+        humidity: 66.7,
+        light: 1250
     },
     lily: {
-        moisture: 70,
-        temperature: 19,
-        humidity: 65,
-        light: 600
+        moisture: 69,
+        temperature: 22.6,
+        humidity: 88.5,
+        light: 305
     },
     cactus: {
-        moisture: 5,
-        temperature: 25,
-        humidity: 15,
-        light: 1200
+        moisture: 70.2,
+        temperature: 22.6,
+        humidity: 88.5,
+        light: 305
     },
     herb: {
-        moisture: 60,
-        temperature: 22,
-        humidity: 45,
-        light: 900
+        moisture: 70.2,
+        temperature: 22.6,
+        humidity: 88.5,
+        light: 305
     },
     mint: {
-        moisture: 65,
-        temperature: 20,
-        humidity: 50,
-        light: 700
+        moisture: 72.5,
+        temperature: 24.5,
+        humidity: 66.7,
+        light: 1250
     }
 };
 
@@ -153,42 +153,62 @@ function updatePlantStatus(plantId, sensorData) {
  * Update a single metric display
  */
 function updateSingleMetricDisplay(plantId, metric, value, status) {
-    const metricElement = document.getElementById(`${plantId}-${metric}-metric`);
-    if (!metricElement) return;
+    // Update the metric for this plant in ALL rooms
+    // Find all rooms where this plant exists
+    const roomsWithPlant = Object.entries(roomAssignments)
+        .filter(([_, plants]) => plants.includes(plantId))
+        .map(([roomId, _]) => roomId);
     
-    // Update value display
-    const valueDisplay = metricElement.querySelector('.metric-value');
-    if (valueDisplay) {
-        let displayValue;
-        switch(metric) {
-            case 'moisture':
-            case 'humidity':
-                displayValue = `${value}%`;
-                break;
-            case 'temperature':
-                displayValue = `${value}°C`;
-                break;
-            case 'light':
-                displayValue = `${value} lux`;
-                break;
-            default:
-                displayValue = value;
+    // Update in each room
+    for (const roomId of roomsWithPlant) {
+        // First, try room-specific element (if it exists)
+        const roomSpecificSelector = `[data-plant="${plantId}"][data-metric="${metric}"][data-room="${roomId}"]`;
+        const roomSpecificIndicators = document.querySelectorAll(roomSpecificSelector);
+        
+        // Update room-specific indicators
+        roomSpecificIndicators.forEach(indicator => {
+            indicator.className = 'indicator-item';
+            indicator.classList.add(status);
+        });
+        
+        // Also update the metric display
+        const metricElement = document.getElementById(`${plantId}-${metric}-metric`);
+        if (metricElement) {
+            // Update value display
+            const valueDisplay = metricElement.querySelector('.metric-value');
+            if (valueDisplay) {
+                let displayValue;
+                switch(metric) {
+                    case 'moisture':
+                    case 'humidity':
+                        displayValue = `${value}%`;
+                        break;
+                    case 'temperature':
+                        displayValue = `${value}°C`;
+                        break;
+                    case 'light':
+                        displayValue = `${value} lux`;
+                        break;
+                    default:
+                        displayValue = value;
+                }
+                valueDisplay.textContent = displayValue;
+            }
+            
+            // Update status styling
+            metricElement.className = 'metric-status';
+            metricElement.classList.add(status);
+            
+            // Update status icon
+            const statusIcon = metricElement.querySelector('.status-icon');
+            if (statusIcon) {
+                statusIcon.className = 'status-icon';
+                statusIcon.classList.add(status);
+            }
         }
-        valueDisplay.textContent = displayValue;
     }
     
-    // Update status styling
-    metricElement.className = 'metric-status';
-    metricElement.classList.add(status);
-    
-    // Update status icon
-    const statusIcon = metricElement.querySelector('.status-icon');
-    if (statusIcon) {
-        statusIcon.className = 'status-icon';
-        statusIcon.classList.add(status);
-    }
-    
-    // Update indicator in header
+    // Update indicators in headers
     updatePlantHeaderIndicator(plantId, metric, status);
 }
 
@@ -196,19 +216,48 @@ function updateSingleMetricDisplay(plantId, metric, value, status) {
  * Update plant header indicator
  */
 function updatePlantHeaderIndicator(plantId, metric, status) {
+    // Find all plant headers that match this plant
+    const plantHeaders = [];
+    
+    // Find by direct plant name match
     document.querySelectorAll('.plant-header').forEach(header => {
         const plantNameElement = header.querySelector('.plant-name');
-        if (plantNameElement && plantNameElement.textContent.toLowerCase().includes(plantId)) {
-            header.querySelectorAll('.indicator-item').forEach(indicator => {
-                if (indicator.getAttribute('data-metric') === metric) {
-                    indicator.className = 'indicator-item';
-                    indicator.classList.add(status);
-                }
-            });
-            
-            // Update happiness indicator
-            updatePlantHappinessIndicator(header, plantId);
+        if (plantNameElement) {
+            // Check for exact plant ID match first
+            if (plantNameElement.textContent.toLowerCase() === plantId) {
+                plantHeaders.push(header);
+            } 
+            // Handle special cases for display names
+            else if (plantId === 'lily' && plantNameElement.textContent.toLowerCase().includes('peace lily')) {
+                plantHeaders.push(header);
+            }
+            // Handle other possible name variations
+            else if (plantNameElement.textContent.toLowerCase().includes(plantId)) {
+                plantHeaders.push(header);
+            }
         }
+    });
+    
+    // Find by data attributes (more reliable)
+    document.querySelectorAll(`[data-plant="${plantId}"]`).forEach(element => {
+        // Find the closest plant header
+        const header = element.closest('.plant-header');
+        if (header && !plantHeaders.includes(header)) {
+            plantHeaders.push(header);
+        }
+    });
+    
+    // Update all found headers
+    plantHeaders.forEach(header => {
+        header.querySelectorAll('.indicator-item').forEach(indicator => {
+            if (indicator.getAttribute('data-metric') === metric) {
+                indicator.className = 'indicator-item';
+                indicator.classList.add(status);
+            }
+        });
+        
+        // Update happiness indicator
+        updatePlantHappinessIndicator(header, plantId);
     });
 }
 
@@ -251,45 +300,53 @@ function updatePlantHappinessIndicator(header, plantId) {
  * Update plant overview
  */
 function updatePlantOverview(plantId) {
-    const overviewElement = document.getElementById(`${plantId}-overview`);
-    if (!overviewElement) return;
+    // Update overview in ALL rooms where this plant exists
+    // Find all rooms with this plant
+    const roomsWithPlant = Object.entries(roomAssignments)
+        .filter(([_, plants]) => plants.includes(plantId))
+        .map(([roomId, _]) => roomId);
     
-    const metrics = ['moisture', 'temperature', 'humidity', 'light'];
-    let warningCount = 0;
-    let badCount = 0;
-    
-    metrics.forEach(metric => {
-        if (plantStatuses[plantId] && plantStatuses[plantId][metric]) {
-            const { status } = plantStatuses[plantId][metric];
-            
-            if (status === 'warning') warningCount++;
-            if (status === 'bad') badCount++;
-            
-            const indicatorElement = overviewElement.querySelector(`.plant-overview-${metric}`);
-            if (indicatorElement) {
-                indicatorElement.className = `plant-overview-${metric}`;
-                indicatorElement.classList.add(status);
+    // Find all overview elements for this plant (may be in multiple rooms)
+    document.querySelectorAll(`#${plantId}-overview, [id^="${plantId}-"][id$="-overview"]`).forEach(overviewElement => {
+        const metrics = ['moisture', 'temperature', 'humidity', 'light'];
+        let warningCount = 0;
+        let badCount = 0;
+        
+        metrics.forEach(metric => {
+            if (plantStatuses[plantId] && plantStatuses[plantId][metric]) {
+                const { status } = plantStatuses[plantId][metric];
+                
+                if (status === 'warning') warningCount++;
+                if (status === 'bad') badCount++;
+                
+                const indicatorElement = overviewElement.querySelector(`.plant-overview-${metric}`);
+                if (indicatorElement) {
+                    indicatorElement.className = `plant-overview-${metric}`;
+                    indicatorElement.classList.add(status);
+                }
+            }
+        });
+        
+        // Update overall status
+        const statusTextElement = overviewElement.querySelector('.plant-status-text');
+        if (statusTextElement) {
+            if (badCount > 0) {
+                statusTextElement.textContent = 'Needs immediate attention!';
+                statusTextElement.className = 'plant-status-text bad';
+            } else if (warningCount > 0) {
+                statusTextElement.textContent = 'Needs attention soon';
+                statusTextElement.className = 'plant-status-text warning';
+            } else {
+                statusTextElement.textContent = 'All metrics optimal';
+                statusTextElement.className = 'plant-status-text good';
             }
         }
     });
     
-    // Update overall status
-    const statusTextElement = overviewElement.querySelector('.plant-status-text');
-    if (statusTextElement) {
-        if (badCount > 0) {
-            statusTextElement.textContent = 'Needs immediate attention!';
-            statusTextElement.className = 'plant-status-text bad';
-        } else if (warningCount > 0) {
-            statusTextElement.textContent = 'Needs attention soon';
-            statusTextElement.className = 'plant-status-text warning';
-        } else {
-            statusTextElement.textContent = 'All metrics optimal';
-            statusTextElement.className = 'plant-status-text good';
-        }
-    }
-    
     // Update status badges
-    updatePlantOverviewStatusBadge(plantId, badCount, warningCount);
+    updatePlantOverviewStatusBadge(plantId, 
+        plantStatuses[plantId] ? Object.values(plantStatuses[plantId]).filter(d => d.status === 'bad').length : 0,
+        plantStatuses[plantId] ? Object.values(plantStatuses[plantId]).filter(d => d.status === 'warning').length : 0);
 }
 
 /**
@@ -330,10 +387,36 @@ function updatePlantHealthPercentage(plantId) {
         statusClass = 'bad';
     }
     
-    // Update displays
+    // Update health displays - including room-specific ones
+    updatePlantHealthDisplays(plantId, healthPercentage, statusClass);
+}
+
+/**
+ * Update all health displays for a plant across rooms
+ */
+function updatePlantHealthDisplays(plantId, healthPercentage, statusClass) {
+    // Find all rooms where this plant exists
+    const roomsWithPlant = Object.entries(roomAssignments)
+        .filter(([_, plants]) => plants.includes(plantId))
+        .map(([roomId, _]) => roomId);
+    
+    // Standard health display format (used in most places)
     document.querySelectorAll(`[id^="${plantId}-health"]`).forEach(element => {
         element.textContent = `${healthPercentage}%`;
         element.className = 'health-percentage';
+        element.classList.add(statusClass);
+    });
+    
+    // Handle special case for bedroom elements in overview
+    document.querySelectorAll(`[id="${plantId}-bedroom-health"]`).forEach(element => {
+        element.textContent = `${healthPercentage}%`;
+        element.className = 'health-percentage';
+        element.classList.add(statusClass);
+    });
+    
+    // Handle status badges in overview
+    document.querySelectorAll(`[id^="${plantId}-"][id$="-status"]`).forEach(element => {
+        element.className = 'status-badge';
         element.classList.add(statusClass);
     });
 }
@@ -353,43 +436,95 @@ function updateRoomSummaries() {
  * Update room status summary
  */
 function updateRoomStatusSummary(roomId, plantIds) {
+    // Update detailed room status (used in room-specific pages)
     const roomStatusElement = document.getElementById(`${roomId}-status`);
-    if (!roomStatusElement) return;
-    
-    let totalWarnings = 0;
-    let totalCritical = 0;
-    let plantsWithData = 0;
-    
-    plantIds.forEach(plantId => {
-        if (plantStatuses[plantId]) {
-            plantsWithData++;
-            
-            for (const [metric, data] of Object.entries(plantStatuses[plantId])) {
-                if (data.status === 'warning') totalWarnings++;
-                if (data.status === 'bad') totalCritical++;
+    if (roomStatusElement) {
+        let totalWarnings = 0;
+        let totalCritical = 0;
+        let plantsWithData = 0;
+        
+        plantIds.forEach(plantId => {
+            if (plantStatuses[plantId]) {
+                plantsWithData++;
+                
+                for (const [metric, data] of Object.entries(plantStatuses[plantId])) {
+                    if (data.status === 'warning') totalWarnings++;
+                    if (data.status === 'bad') totalCritical++;
+                }
+            }
+        });
+        
+        let roomStatus = 'neutral';
+        let statusText = 'No data available';
+        
+        if (plantsWithData > 0) {
+            if (totalCritical > 0) {
+                roomStatus = 'bad';
+                statusText = 'Plants need immediate attention!';
+            } else if (totalWarnings > 0) {
+                roomStatus = 'warning';
+                statusText = 'Some plants need attention soon';
+            } else {
+                roomStatus = 'good';
+                statusText = 'All plants healthy';
             }
         }
-    });
-    
-    let roomStatus = 'neutral';
-    let statusText = 'No data available';
-    
-    if (plantsWithData > 0) {
-        if (totalCritical > 0) {
-            roomStatus = 'bad';
-            statusText = 'Plants need immediate attention!';
-        } else if (totalWarnings > 0) {
-            roomStatus = 'warning';
-            statusText = 'Some plants need attention soon';
-        } else {
-            roomStatus = 'good';
-            statusText = 'All plants healthy';
-        }
+        
+        roomStatusElement.className = 'room-status';
+        roomStatusElement.classList.add(roomStatus);
+        roomStatusElement.textContent = statusText;
     }
     
-    roomStatusElement.className = 'room-status';
-    roomStatusElement.classList.add(roomStatus);
-    roomStatusElement.textContent = statusText;
+    // Update room health in overview page
+    const roomHealthElement = document.getElementById(`${roomId}-health`);
+    if (roomHealthElement) {
+        // Calculate overall room health percentage
+        let totalHealthScore = 0;
+        let totalPlants = 0;
+        
+        plantIds.forEach(plantId => {
+            if (plantStatuses[plantId]) {
+                totalPlants++;
+                
+                let plantMetrics = 0;
+                let plantScore = 0;
+                
+                // Calculate plant health score
+                for (const [metric, data] of Object.entries(plantStatuses[plantId])) {
+                    plantMetrics++;
+                    
+                    switch(data.status) {
+                        case 'good': plantScore += 100; break;
+                        case 'warning': plantScore += 50; break;
+                        case 'bad': plantScore += 0; break;
+                        default: plantMetrics--; break; // Don't count neutral
+                    }
+                }
+                
+                if (plantMetrics > 0) {
+                    totalHealthScore += Math.round(plantScore / plantMetrics);
+                }
+            }
+        });
+        
+        // Calculate room health percentage
+        const healthPercentage = totalPlants > 0 ? Math.round(totalHealthScore / totalPlants) : 0;
+        
+        // Determine status class
+        let statusClass;
+        if (healthPercentage >= 80) {
+            statusClass = 'good';
+        } else if (healthPercentage >= 40) {
+            statusClass = 'warning';
+        } else {
+            statusClass = 'bad';
+        }
+        
+        // Update room health display
+        roomHealthElement.textContent = `${healthPercentage}%`;
+        roomHealthElement.className = 'health-percentage';
+        roomHealthElement.classList.add(statusClass);
+    }
 }
 
 /**
@@ -397,19 +532,40 @@ function updateRoomStatusSummary(roomId, plantIds) {
  */
 function updateEnvironmentalSummaries() {
     const metrics = ['temperature', 'humidity', 'moisture', 'light'];
+    const rooms = Object.keys(roomAssignments);
     
+    // Calculate global AND room-specific averages
     metrics.forEach(metric => {
-        const values = [];
+        // For each room, calculate room-specific average
+        rooms.forEach(roomId => {
+            const plantsInRoom = roomAssignments[roomId] || [];
+            const roomValues = [];
+            
+            // Collect values only from plants in this room
+            plantsInRoom.forEach(plantId => {
+                if (plantData[plantId] && plantData[plantId][metric] !== undefined) {
+                    roomValues.push(plantData[plantId][metric]);
+                }
+            });
+            
+            // Calculate and update room-specific average
+            if (roomValues.length > 0) {
+                const roomAverage = roomValues.reduce((sum, val) => sum + val, 0) / roomValues.length;
+                updateEnvironmentalSummary(metric, roomAverage, roomId);
+            }
+        });
         
+        // Calculate global average (for backward compatibility)
+        const globalValues = [];
         for (const plantId of Object.keys(plantData)) {
-            if (plantData[plantId][metric]) {
-                values.push(plantData[plantId][metric]);
+            if (plantData[plantId][metric] !== undefined) {
+                globalValues.push(plantData[plantId][metric]);
             }
         }
         
-        if (values.length > 0) {
-            const average = values.reduce((sum, val) => sum + val, 0) / values.length;
-            updateEnvironmentalSummary(metric, average);
+        if (globalValues.length > 0) {
+            const globalAverage = globalValues.reduce((sum, val) => sum + val, 0) / globalValues.length;
+            updateEnvironmentalSummary(metric, globalAverage);
         }
     });
 }
@@ -417,8 +573,13 @@ function updateEnvironmentalSummaries() {
 /**
  * Update specific environmental summary
  */
-function updateEnvironmentalSummary(metric, value) {
-    document.querySelectorAll(`#${metric}-summary`).forEach(element => {
+function updateEnvironmentalSummary(metric, value, roomId) {
+    // Select the appropriate elements based on room
+    const selector = roomId 
+        ? `#${metric}-summary[data-room="${roomId}"]` 
+        : `#${metric}-summary:not([data-room])`;
+    
+    document.querySelectorAll(selector).forEach(element => {
         let displayText;
         switch(metric) {
             case 'temperature':
