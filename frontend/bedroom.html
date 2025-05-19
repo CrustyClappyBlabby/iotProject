@@ -42,364 +42,132 @@
                     <header class="mb-4">
                         <h1 class="page-title">Bedroom</h1>
                     </header>
-                    
-                    <!-- Room Status -->
-                    <div id="bedroom-status" class="room-status neutral">No data available</div>
-                    
-                    <!-- Environmental Summary -->
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Environmental Overview</h5>
-                            <div class="row mt-3">
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="env-metric">
-                                        <div class="env-icon neutral">
-                                            <span>💧</span>
-                                        </div>
-                                        <div class="env-details">
-                                            <h6>Moisture</h6>
-                                            <span id="moisture-summary" data-room="bedroom">No data available</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="env-metric">
-                                        <div class="env-icon neutral">
-                                            <span>🌡️</span>
-                                        </div>
-                                        <div class="env-details">
-                                            <h6>Temperature</h6>
-                                            <span id="temperature-summary" data-room="bedroom">No data available</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="env-metric">
-                                        <div class="env-icon neutral">
-                                            <span>☀️</span>
-                                        </div>
-                                        <div class="env-details">
-                                            <h6>Light</h6>
-                                            <span id="light-summary" data-room="bedroom">No data available</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="env-metric">
-                                        <div class="env-icon neutral">
-                                            <span>💦</span>
-                                        </div>
-                                        <div class="env-details">
-                                            <h6>Humidity</h6>
-                                            <span id="humidity-summary" data-room="bedroom">No data available</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
+                    <!-- Loading State -->
+                    <div id="loading-container" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
+                        <p class="mt-3">Loading bedroom plants...</p>
                     </div>
 
-                    <!-- Plant Monitoring Section -->
-                    <div class="plant-section">
-                        <!-- Plant 1: Ficus -->
-                        <div class="card plant-card shadow-sm mb-4">
-                            <div class="card-header plant-header" data-toggle-target="#ficusDetails" onclick="togglePanel('#ficusDetails', this); return false;">
-                                <div class="plant-name">Ficus</div>
-                                <span id="ficus-health" class="health-percentage neutral ms-2"></span>
-                                <div class="plant-indicators">
-                                    <div class="indicator-item neutral" title="Moisture" data-metric="moisture" data-plant="ficus" data-room="bedroom">
-                                        <span>💧</span>
-                                    </div>
-                                    <div class="indicator-item neutral" title="Humidity" data-metric="humidity" data-plant="ficus" data-room="bedroom">
-                                        <span>💦</span>
-                                    </div>
-                                    <div class="indicator-item neutral" title="Temperature" data-metric="temperature" data-plant="ficus" data-room="bedroom">
-                                        <span>🌡️</span>
-                                    </div>
-                                    <div class="indicator-item neutral" title="Light" data-metric="light" data-plant="ficus" data-room="bedroom">
-                                        <span>☀️</span>
-                                    </div>
-                                    <div class="indicator-item d-none" title="Overall Health">
-                                        <span>❤️</span>
-                                    </div>
-                                </div>
-                                <div class="toggle-icon">
-                                    <span>⌄</span>
-                                </div>
-                            </div>
-                            <div id="ficus-overview" class="plant-overview">
-                              <div class="plant-overview-moisture neutral"></div>
-                              <div class="plant-overview-temperature neutral"></div>
-                              <div class="plant-overview-humidity neutral"></div>
-                              <div class="plant-overview-light neutral"></div>
-                              <div class="plant-status-text">All metrics optimal</div>
-                            </div>
-                            <div id="ficusDetails" class="collapse show">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="metric-card">
-                                                <h5 class="metric-title">Moisture Level</h5>
-                                                <div class="chart-container">
-                                                    <!-- Grafana iframe for moisture -->
-                                                    <iframe 
-                                                        src="http://172.24.234.88:3000/d-solo/bekzrt18hh79cb/ficus?orgId=1&from=1744999858891&to=1745014706783&timezone=browser&panelId=3&__feature.dashboardSceneSolo"
-                                                        width="100%"
-                                                        height="200"
-                                                        frameborder="0"
-                                                        data-plant-id="ficus"
-                                                        data-metric="moisture">
-                                                    </iframe>
-                                                </div>
-                                                <div id="ficus-moisture-metric" class="metric-status neutral">
-                                                    <span class="status-icon">💧</span>
-                                                    <span class="metric-value"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="metric-card">
-                                                <h5 class="metric-title">Temperature</h5>
-                                                <div class="chart-container">
-                                                    <!-- Grafana iframe for temperature -->
-                                                    <iframe 
-                                                        src="http://172.24.234.88:3000/d-solo/bekzrt18hh79cb/ficus?orgId=1&from=1744999858891&to=1745014706783&timezone=browser&panelId=4&__feature.dashboardSceneSolo"
-                                                        width="100%"
-                                                        height="200"
-                                                        frameborder="0"
-                                                        data-plant-id="ficus"
-                                                        data-metric="temperature">
-                                                    </iframe>
-                                                </div>
-                                                <div id="ficus-temperature-metric" class="metric-status neutral">
-                                                    <span class="status-icon">🌡️</span>
-                                                    <span class="metric-value"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="metric-card">
-                                                <h5 class="metric-title">Light Intensity</h5>
-                                                <div class="chart-container">
-                                                    <!-- Grafana iframe for light -->
-                                                    <iframe 
-                                                        src="http://172.24.234.88:3000/d-solo/bekzrt18hh79cb/ficus?orgId=1&from=1744999858891&to=1745014706783&timezone=browser&panelId=1&__feature.dashboardSceneSolo"
-                                                        width="100%"
-                                                        height="200"
-                                                        frameborder="0"
-                                                        data-plant-id="ficus"
-                                                        data-metric="light">
-                                                    </iframe>
-                                                </div>
-                                                <div id="ficus-light-metric" class="metric-status neutral">
-                                                    <span class="status-icon">☀️</span>
-                                                    <span class="metric-value"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="metric-card">
-                                                <h5 class="metric-title">Humidity</h5>
-                                                <div class="chart-container">
-                                                    <!-- Grafana iframe for humidity -->
-                                                    <iframe 
-                                                        src="http://172.24.234.88:3000/d-solo/bekzrt18hh79cb/ficus?orgId=1&from=1744999858891&to=1745014706783&timezone=browser&panelId=2&__feature.dashboardSceneSolo"
-                                                        width="100%"
-                                                        height="200"
-                                                        frameborder="0"
-                                                        data-plant-id="ficus"
-                                                        data-metric="humidity">
-                                                    </iframe>
-                                                </div>
-                                                <div id="ficus-humidity-metric" class="metric-status neutral">
-                                                    <span class="status-icon">💦</span>
-                                                    <span class="metric-value"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Error Container -->
+                    <div id="error-container" style="display: none;">
+                        <!-- Error content will be dynamically inserted here -->
+                    </div>
+
+                    <!-- Main Content Container -->
+                    <div id="room-container" style="display: none;">
+                        <!-- Room Status -->
+                        <div id="bedroom-status" class="room-status neutral mb-4">Loading...</div>
                         
-                        <!-- Plant 2: Peace Lily -->
-                        <div class="card plant-card shadow-sm mb-4">
-                            <div class="card-header plant-header" data-toggle-target="#lilyDetails" onclick="togglePanel('#lilyDetails', this); return false;">
-                                <div class="plant-name">Peace Lily</div>
-                                <span id="lily-health" class="health-percentage neutral ms-2"></span>
-                                <div class="plant-indicators">
-                                    <div class="indicator-item neutral" title="Moisture" data-metric="moisture" data-plant="lily" data-room="bedroom">
-                                        <span>💧</span>
-                                    </div>
-                                    <div class="indicator-item neutral" title="Humidity" data-metric="humidity" data-plant="lily" data-room="bedroom">
-                                        <span>💦</span>
-                                    </div>
-                                    <div class="indicator-item neutral" title="Temperature" data-metric="temperature" data-plant="lily" data-room="bedroom">
-                                        <span>🌡️</span>
-                                    </div>
-                                    <div class="indicator-item neutral" title="Light" data-metric="light" data-plant="lily" data-room="bedroom">
-                                        <span>☀️</span>
-                                    </div>
-                                    <div class="indicator-item d-none" title="Overall Health">
-                                        <span>❤️</span>
-                                    </div>
-                                </div>
-                                <div class="toggle-icon">
-                                    <span>⌄</span>
-                                </div>
-                            </div>
-                            <div id="lily-overview" class="plant-overview">
-                              <div class="plant-overview-moisture neutral"></div>
-                              <div class="plant-overview-temperature neutral"></div>
-                              <div class="plant-overview-humidity neutral"></div>
-                              <div class="plant-overview-light neutral"></div>
-                              <div class="plant-status-text">All metrics optimal</div>
-                            </div>
-                            <div id="lilyDetails" class="collapse">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="metric-card">
-                                                <h5 class="metric-title">Moisture Level</h5>
-                                                <div class="chart-container">
-                                                    <!-- Updated Grafana iframe for moisture -->
-                                                    <iframe 
-                                                        src="http://172.24.234.88:3000/d-solo/bej2zvhohsfswf/lily?orgId=1&from=1744803028285&to=1744806593840&timezone=browser&panelId=3&__feature.dashboardSceneSolo"
-                                                        width="100%"
-                                                        height="200"
-                                                        frameborder="0"
-                                                        data-plant-id="lily"
-                                                        data-metric="moisture">
-                                                    </iframe>
-                                                </div>
-                                                <div id="lily-moisture-metric" class="metric-status neutral">
-                                                    <span class="status-icon">💧</span>
-                                                    <span class="metric-value"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="metric-card">
-                                                <h5 class="metric-title">Temperature</h5>
-                                                <div class="chart-container">
-                                                    <!-- Updated Grafana iframe for temperature -->
-                                                    <iframe 
-                                                        src="http://172.24.234.88:3000/d-solo/bej2zvhohsfswf/lily?orgId=1&from=1744803028285&to=1744806593840&timezone=browser&panelId=1&__feature.dashboardSceneSolo"
-                                                        width="100%"
-                                                        height="200"
-                                                        frameborder="0"
-                                                        data-plant-id="lily"
-                                                        data-metric="temperature">
-                                                    </iframe>
-                                                </div>
-                                                <div id="lily-temperature-metric" class="metric-status neutral">
-                                                    <span class="status-icon">🌡️</span>
-                                                    <span class="metric-value"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="metric-card">
-                                                <h5 class="metric-title">Light Intensity</h5>
-                                                <div class="chart-container">
-                                                    <!-- Updated Grafana iframe for light -->
-                                                    <iframe 
-                                                        src="http://172.24.234.88:3000/d-solo/bej2zvhohsfswf/lily?orgId=1&from=1744803028285&to=1744806593840&timezone=browser&panelId=4&__feature.dashboardSceneSolo"
-                                                        width="100%"
-                                                        height="200"
-                                                        frameborder="0"
-                                                        data-plant-id="lily"
-                                                        data-metric="light">
-                                                    </iframe>
-                                                </div>
-                                                <div id="lily-light-metric" class="metric-status neutral">
-                                                    <span class="status-icon">☀️</span>
-                                                    <span class="metric-value"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="metric-card">
-                                                <h5 class="metric-title">Humidity</h5>
-                                                <div class="chart-container">
-                                                    <!-- Updated Grafana iframe for humidity -->
-                                                    <iframe 
-                                                        src="http://172.24.234.88:3000/d-solo/bej2zvhohsfswf/lily?orgId=1&from=1744803028285&to=1744806593840&timezone=browser&panelId=2&__feature.dashboardSceneSolo"
-                                                        width="100%"
-                                                        height="200"
-                                                        frameborder="0"
-                                                        data-plant-id="lily"
-                                                        data-metric="humidity">
-                                                    </iframe>
-                                                </div>
-                                                <div id="lily-humidity-metric" class="metric-status neutral">
-                                                    <span class="status-icon">💦</span>
-                                                    <span class="metric-value"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Health Calculation Info Box -->
-                    <div class="info-toggle-container text-center mb-3 mt-4">
-                        <button class="btn btn-sm btn-outline-info info-button" type="button" data-target="#healthInfoCollapse">
-                            <i class="bi bi-info-circle"></i> How is plant health calculated?
-                        </button>
-                    </div>
-                    <div class="collapse" id="healthInfoCollapse">
+                        <!-- Environmental Summary -->
                         <div class="card shadow-sm mb-4">
                             <div class="card-body">
-                                <h5 class="card-title">Plant Health Percentage - How is it calculated?</h5>
-                                <p>The percentage value for each plant is calculated based on four measured parameters: moisture, temperature, light, and humidity.</p>
-                                <ul>
-                                    <li><strong>Optimal value (100%):</strong> Parameter is within the plant's optimal range</li>
-                                    <li><strong>Warning (50%):</strong> Parameter is between the optimal range and min/max limits</li>
-                                    <li><strong>Critical (0%):</strong> Parameter is below minimum or above maximum threshold</li>
-                                </ul>
-                                <p>The overall percentage is the average of all four parameters, and the color indicates the plant's general condition:<br>
-                                <span class="badge bg-success">Green (≥80%)</span> 
-                                <span class="badge bg-warning">Yellow (40-79%)</span> 
-                                <span class="badge bg-danger">Red (≤39%)</span></p>
+                                <h5 class="card-title">Environmental Overview</h5>
+                                <div class="row mt-3">
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="env-metric">
+                                            <div class="env-icon neutral">
+                                                <span>💧</span>
+                                            </div>
+                                            <div class="env-details">
+                                                <h6>Moisture</h6>
+                                                <span id="moisture-summary">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="env-metric">
+                                            <div class="env-icon neutral">
+                                                <span>🌡️</span>
+                                            </div>
+                                            <div class="env-details">
+                                                <h6>Temperature</h6>
+                                                <span id="temperature-summary">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="env-metric">
+                                            <div class="env-icon neutral">
+                                                <span>☀️</span>
+                                            </div>
+                                            <div class="env-details">
+                                                <h6>Light</h6>
+                                                <span id="light-summary">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="env-metric">
+                                            <div class="env-icon neutral">
+                                                <span>💦</span>
+                                            </div>
+                                            <div class="env-details">
+                                                <h6>Humidity</h6>
+                                                <span id="humidity-summary">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Plant Monitoring Section -->
+                        <div class="plant-section" id="plant-section">
+                            <!-- Plants will be dynamically generated here -->
+                        </div>
                     </div>
-                    
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- jQuery first (for panel functionality) -->
+    <!-- jQuery (for panel animations) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Application JavaScript -->
-    <script src="simpleMockData.js"></script>
+    <!-- Config and API -->
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
     
-    <!-- Panel toggling script -->
+    <!-- PlantManager -->
+    <script src="js/plant-manager.js"></script>
+    
+    <!-- Simple Room Handler -->
+    <script src="js/room-handler.js"></script>
+    
+    <!-- Initialize room -->
     <script>
-    $(document).ready(function() {
-        // Panel toggling is now handled via inline onclick handlers
-        
-        // Initialize panels on page load
-        $('.collapse').each(function() {
-            const $panel = $(this);
-            if ($panel.hasClass('show')) {
-                $panel.show();
-                const panelId = $panel.attr('id');
-                const $header = $(`[data-toggle-target="#${panelId}"]`);
-                $header.find('.toggle-icon span').text('⌃');
-            } else {
-                $panel.hide();
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing bedroom...');
+            
+            // Create global PlantManager instance if it doesn't exist
+            window.plantManager = window.plantManager || new PlantManager();
+            
+            // Create and initialize room handler
+            const roomHandler = new SimpleRoomHandler('bedroom');
+            roomHandler.init();
         });
-    });
+        
+        // Global panel toggle function for plant cards
+        function togglePlantPanel(plantId) {
+            const panel = document.getElementById(`panel-${plantId}`);
+            const icon = document.getElementById(`toggle-${plantId}`);
+            
+            if (!panel) return;
+            
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                $(panel).slideDown(200);
+                if (icon) icon.textContent = '⌃';
+            } else {
+                $(panel).slideUp(200);
+                if (icon) icon.textContent = '⌄';
+            }
+        }
     </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 /**
  * InfluxDB API Server
- * This server provides endpoints to access data from InfluxDB for the IoT plant monitoring project.
+ * This server provides endpoints to access data from InfluxDB
  */
 
 // Import required packages
@@ -12,7 +12,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT;
 
-// Enable CORS for cross-origin requests
+// Enable CORS for cross-origin requests (all domains can call API)
 app.use(cors());
 app.use(express.json());
 
@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 // Mount API routes
 app.use('/api', apiRoutes);
 
-// Simple error handling middleware
+// Simple error handling
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({

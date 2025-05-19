@@ -1,27 +1,20 @@
 /**
  * API Routes
- * All routes for the IoT Plant Monitoring API
  */
 const express = require('express');
 const router = express.Router();
-const apiController = require('../controllers/apiController');
+const plantController = require('../controllers/plantController');
 
 // Health check
-router.get('/health', apiController.healthCheck);
+router.get('/health', plantController.healthCheck);
 
-// Test InfluxDB connection
-router.get('/test', apiController.testConnection);
+// Test InfluxDB connection  
+router.get('/test', plantController.testConnection);
 
-// System information endpoints (combining debug and schema)
-router.get('/system/diagnostics', apiController.getDebugData);
-router.get('/system/schema', apiController.getSchema);
+// Main endpoint - gets all plants
+router.get('/discover', plantController.discoverAll);
 
-// Plant routes
-router.get('/plants', apiController.getAllPlants);
-router.get('/plants/:id/latest', apiController.getPlantLatestValues);
-
-// Room routes
-router.get('/rooms', apiController.getAllRooms);
-router.get('/rooms/:id/summary', apiController.getRoomSummary);
+// Individual plant data
+router.get('/plants/:id', plantController.getPlantData);
 
 module.exports = router;

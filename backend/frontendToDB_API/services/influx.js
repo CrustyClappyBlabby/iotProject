@@ -1,42 +1,53 @@
 /**
- * InfluxDB Service
- * Handles all interactions with InfluxDB
+ * InfluxDB Service - Simplified version
+ * Handles database queries using Flux language
  */
 const { InfluxDB } = require('@influxdata/influxdb-client');
 const dbConfig = require('../config/db');
 
-// Create InfluxDB client
+// Initialize InfluxDB client
 const influxClient = new InfluxDB({
   url: dbConfig.url,
   token: dbConfig.token,
   timeout: dbConfig.timeout
 });
 
-// Get InfluxDB query API
 const queryApi = influxClient.getQueryApi(dbConfig.org);
 
 /**
- * Execute a Flux query and return the results (Private method)
+ * Execute a Flux query and return results
  */
-async function _executeQuery(query) {
+async function _executeFluxQuery(fluxQuery) {
   try {
-    return await queryApi.collectRows(query);
+    console.log('Executing Flux query:', fluxQuery);
+    return await queryApi.collectRows(fluxQuery); // collectRows collects all query results to an array, influxdb js-client method
   } catch (error) {
+    console.error('Flux Query Error:', error);
     throw error;
   }
 }
 
 /**
- * Test database connection by listing buckets
+ * Test database connection
  */
 async function testConnection() {
-  const query = 'buckets()';
-  const data = await _executeQuery(query);
-  return data.map(b => b.name);
+  const query = `buckets() |> filter(fn: (r) => r.name == "${dbConfig.bucket}")`;
+  
+  try {
+    const data = await _executeFluxQuery(query);
+    return { 
+      success: true, 
+      bucket: dbConfig.bucket,
+      bucketExists: data.length > 0
+    };
+  } catch (error) {
+    console.error('Connection test failed:', error);
+    throw error;
+  }
 }
 
 /**
- * Get all plant IDs
+ * Get all plant IDs from database
  */
 async function getPlants() {
   const query = `
@@ -47,124 +58,62 @@ async function getPlants() {
       |> distinct(column: "Plant_ID")
   `;
 
-  const data = await _executeQuery(query);
-  return data.map(row => row.Plant_ID).filter(Boolean);
+  try {
+    console.log('Getting all plants...');
+    const data = await _executeFluxQuery(query);
+    
+    // Extract plant IDs from results
+    const plantIds = data.map(row => row.Plant_ID).filter(Boolean);
+    
+    console.log('Found plant IDs:', plantIds);
+    return plantIds;
+  } catch (error) {
+    console.error('Error getting plants:', error);
+    return []; // Return empty array if error
+  }
 }
 
 /**
- * Get latest values for a specific plant
+ * Get latest sensor values for a specific plant
  */
 async function getLatestPlantValues(plantId) {
+  // Query to get latest data for plant (pivoted format)
   const query = `
     from(bucket: "${dbConfig.bucket}")
-      |> range(start: -1h)
+      |> range(start: -30d)
       |> filter(fn: (r) => r._measurement == "plant_test")
       |> filter(fn: (r) => r.Plant_ID == "${plantId}")
-      |> last()
-      |> yield(name: "last")
+      |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+      |> sort(columns: ["_time"], desc: true)
+      |> limit(n: 1)
   `;
-
-  const data = await _executeQuery(query);
-
-  // Process data to return latest values
-  const results = {};
-  data.forEach(row => {
-    results[row._field] = row._value;
-  });
-
-  return results;
-}
-
-/**
- * Get all room IDs
- */
-async function getRooms() {
-  const query = `
-    from(bucket: "${dbConfig.bucket}")
-      |> range(start: -30d)
-      |> filter(fn: (r) => r._measurement == "plant_test")
-      |> group(columns: ["room_ID"])
-      |> distinct(column: "room_ID")
-  `;
-
-  const data = await _executeQuery(query);
-  return data.map(row => row.room_ID).filter(Boolean);
-}
-
-/**
- * Get room summary (average of all metrics)
- */
-async function getRoomSummary(roomId) {
-  const query = `
-    from(bucket: "${dbConfig.bucket}")
-      |> range(start: -1h)
-      |> filter(fn: (r) => r._measurement == "plant_test")
-      |> filter(fn: (r) => r.room_ID == "${roomId}")
-      |> group(columns: ["_field"])
-      |> mean()
-      |> yield(name: "mean")
-  `;
-
-  const data = await _executeQuery(query);
-
-  // Process data to return average values
-  const results = {};
-  data.forEach(row => {
-    results[row._field] = row._value;
-  });
-
-  return results;
-}
-
-/**
- * Get debug data (sample of raw data)
- */
-async function getDebugData() {
-  const query = `
-    from(bucket: "${dbConfig.bucket}")
-      |> range(start: -30d)
-      |> limit(n: 10)
-  `;
-
-  return await _executeQuery(query);
-}
-
-/**
- * Get complete schema information
- */
-async function getSchemaInfo() {
-  const measurementsQuery = `
-    import "influxdata/influxdb/schema"
-    schema.measurements(bucket: "${dbConfig.bucket}")
-  `;
-
-  const fieldKeysQuery = `
-    import "influxdata/influxdb/schema"
-    schema.fieldKeys(bucket: "${dbConfig.bucket}")
-  `;
-
-  const tagKeysQuery = `
-    import "influxdata/influxdb/schema"
-    schema.tagKeys(bucket: "${dbConfig.bucket}")
-  `;
-
-  const measurements = await _executeQuery(measurementsQuery);
-  const fieldKeys = await _executeQuery(fieldKeysQuery);
-  const tagKeys = await _executeQuery(tagKeysQuery);
-
-  return {
-    measurements: measurements.map(row => row._value),
-    fieldKeys: fieldKeys.map(row => row._value),
-    tagKeys: tagKeys.map(row => row._value)
-  };
+  
+  try {
+    const data = await _executeFluxQuery(query);
+    
+    if (!data || data.length === 0) {
+      console.log(`No data found for plant: ${plantId}`);
+      return null;
+    }
+    
+    // Return sensor values in standard format
+    const result = data[0];
+    return {
+      humidity: result.humidity || null,
+      light: result.light || null,
+      moisture: result.moisture || null,
+      temperature: result.temperature || null
+    };
+    
+  } catch (error) {
+    console.error(`Error getting data for ${plantId}:`, error);
+    return null;
+  }
 }
 
 module.exports = {
   testConnection,
   getPlants,
   getLatestPlantValues,
-  getRooms,
-  getRoomSummary,
-  getDebugData,
-  getSchemaInfo
+  _executeFluxQuery
 };

@@ -72,7 +72,7 @@ body {
     color: #fff;
 }
 
-.room-status.good {
+.room-status.optimal {
     background-color: var(--good-color);
 }
 
@@ -81,12 +81,21 @@ body {
     color: #212529;
 }
 
-.room-status.bad {
+.room-status.critical {
     background-color: var(--bad-color);
 }
 
 .room-status.neutral {
     background-color: var(--neutral-color);
+}
+
+/* Legacy class names for backward compatibility */
+.room-status.good {
+    background-color: var(--good-color);
+}
+
+.room-status.bad {
+    background-color: var(--bad-color);
 }
 
 .status-emoji {
@@ -169,7 +178,7 @@ body {
     font-size: 0.9rem;
 }
 
-.indicator-item.good {
+.indicator-item.optimal {
     background-color: rgba(40, 167, 69, 0.8);
 }
 
@@ -177,12 +186,21 @@ body {
     background-color: rgba(255, 193, 7, 0.8);
 }
 
-.indicator-item.bad {
+.indicator-item.critical {
     background-color: rgba(220, 53, 69, 0.8);
 }
 
 .indicator-item.neutral {
     background-color: rgba(108, 117, 125, 0.5);
+}
+
+/* Legacy class names for backward compatibility */
+.indicator-item.good {
+    background-color: rgba(40, 167, 69, 0.8);
+}
+
+.indicator-item.bad {
+    background-color: rgba(220, 53, 69, 0.8);
 }
 
 /* Chart container adjustments */
@@ -245,7 +263,7 @@ body {
     align-items: center;
 }
 
-.status-indicator.good {
+.status-indicator.optimal {
     background-color: rgba(40, 167, 69, 0.15);
     color: var(--good-color);
 }
@@ -255,7 +273,7 @@ body {
     color: #856404;
 }
 
-.status-indicator.bad {
+.status-indicator.critical {
     background-color: rgba(220, 53, 69, 0.15);
     color: var(--bad-color);
 }
@@ -263,6 +281,17 @@ body {
 .status-indicator.neutral {
     background-color: rgba(108, 117, 125, 0.15);
     color: var(--neutral-color);
+}
+
+/* Legacy class names for backward compatibility */
+.status-indicator.good {
+    background-color: rgba(40, 167, 69, 0.15);
+    color: var(--good-color);
+}
+
+.status-indicator.bad {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: var(--bad-color);
 }
 
 .status-message {
@@ -283,7 +312,7 @@ body {
     display: inline-block;
 }
 
-.health-percentage.good {
+.health-percentage.optimal {
     color: var(--good-color);
 }
 
@@ -291,12 +320,21 @@ body {
     color: var(--warning-color);
 }
 
-.health-percentage.bad {
+.health-percentage.critical {
     color: var(--bad-color);
 }
 
 .health-percentage.neutral {
     color: var(--neutral-color);
+}
+
+/* Legacy class names for backward compatibility */
+.health-percentage.good {
+    color: var(--good-color);
+}
+
+.health-percentage.bad {
+    color: var(--bad-color);
 }
 
 /* Style for health percentages in overview */
@@ -338,6 +376,26 @@ body {
     justify-content: center;
     border-radius: 50%;
     background-color: rgba(46, 125, 50, 0.1);
+}
+
+.env-icon.optimal {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: var(--good-color);
+}
+
+.env-icon.warning {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #856404;
+}
+
+.env-icon.critical {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: var(--bad-color);
+}
+
+.env-icon.neutral {
+    background-color: rgba(108, 117, 125, 0.2);
+    color: var(--neutral-color);
 }
 
 .env-details h5 {

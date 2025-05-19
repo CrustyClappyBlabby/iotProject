@@ -43,188 +43,139 @@
                         <h1 class="page-title">Plant Monitoring Overview</h1>
                     </header>
 
-                    <!-- Room Summary Cards -->
-                    <div class="row g-4 mb-4">
-                        <!-- Living Room Card -->
-                        <div class="col-md-4">
-                            <div class="card shadow-sm h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Living Room</h5>
-                                    <div class="summary-stats mt-3 mb-3">
-                                        <div class="d-flex justify-content-between">
-                                            <div>Plants: <strong>3</strong></div>
-                                            <div>Status: <span id="livingRoom-health" class="health-percentage neutral" data-room="livingRoom"></span></div>
-                                        </div>
-                                    </div>
-                                    <div class="plant-list">
-                                        <div class="small-plant-item">
-                                            <span class="plant-name">Ficus</span>
-                                            <span id="ficus-overview-status" class="status-badge neutral" data-plant="ficus" data-room="livingRoom"></span>
-                                            <span id="ficus-health" class="health-percentage neutral"></span>
-                                        </div>
-                                        <div class="small-plant-item">
-                                            <span class="plant-name">Peace Lily</span>
-                                            <span id="lily-overview-status" class="status-badge neutral" data-plant="lily" data-room="livingRoom"></span>
-                                            <span id="lily-health" class="health-percentage neutral"></span>
-                                        </div>
-                                        <div class="small-plant-item">
-                                            <span class="plant-name">Cactus</span>
-                                            <span id="cactus-overview-status" class="status-badge neutral" data-plant="cactus" data-room="livingRoom"></span>
-                                            <span id="cactus-health" class="health-percentage neutral"></span>
-                                        </div>
-                                    </div>
-                                    <a href="livingRoom.html" class="btn btn-outline-success w-100 mt-3">View Details</a>
-                                </div>
-                            </div>
+                    <!-- Loading State -->
+                    <div id="loading-container" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
-                        
-                        <!-- Kitchen Card -->
-                        <div class="col-md-4">
-                            <div class="card shadow-sm h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Kitchen</h5>
-                                    <div class="summary-stats mt-3 mb-3">
-                                        <div class="d-flex justify-content-between">
-                                            <div>Plants: <strong>2</strong></div>
-                                            <div>Status: <span id="kitchen-health" class="health-percentage neutral" data-room="kitchen"></span></div>
-                                        </div>
-                                    </div>
-                                    <div class="plant-list">
-                                        <div class="small-plant-item text-muted">
-                                            <span class="plant-name">Herbs</span>
-                                            <span id="herb-overview-status" class="status-badge neutral" data-plant="herb" data-room="kitchen"></span>
-                                            <span id="herb-health" class="health-percentage neutral"></span>
-                                        </div>
-                                        <div class="small-plant-item text-muted">
-                                            <span class="plant-name">Mint</span>
-                                            <span id="mint-overview-status" class="status-badge neutral" data-plant="mint" data-room="kitchen"></span>
-                                            <span id="mint-health" class="health-percentage neutral"></span>
-                                        </div>
-                                    </div>
-                                    <a href="kitchen.html" class="btn btn-outline-success w-100 mt-3">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Bedroom Card -->
-                        <div class="col-md-4">
-                            <div class="card shadow-sm h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Bedroom</h5>
-                                    <div class="summary-stats mt-3 mb-3">
-                                        <div class="d-flex justify-content-between">
-                                            <div>Plants: <strong>2</strong></div>
-                                            <div>Status: <span id="bedroom-health" class="health-percentage neutral" data-room="bedroom"></span></div>
-                                        </div>
-                                    </div>
-                                    <div class="plant-list">
-                                        <div class="small-plant-item text-muted">
-                                            <span class="plant-name">Ficus</span>
-                                            <span id="ficus-bedroom-status" class="status-badge neutral" data-plant="ficus" data-room="bedroom"></span>
-                                            <span id="ficus-bedroom-health" class="health-percentage neutral"></span>
-                                        </div>
-                                        <div class="small-plant-item text-muted">
-                                            <span class="plant-name">Peace Lily</span>
-                                            <span id="lily-bedroom-status" class="status-badge neutral" data-plant="lily" data-room="bedroom"></span>
-                                            <span id="lily-bedroom-health" class="health-percentage neutral"></span>
-                                        </div>
-                                    </div>
-                                    <a href="bedroom.html" class="btn btn-outline-success w-100 mt-3">View Details</a>
-                                </div>
-                            </div>
-                        </div>
+                        <p class="mt-3">Discovering plants from database...</p>
                     </div>
 
-                    <!-- Health Calculation Info Box -->
-                    <div class="info-toggle-container text-center mb-4 mt-3">
-                        <button class="btn btn-sm btn-outline-info info-button" type="button" data-target="#healthInfoCollapse">
-                            <i class="bi bi-info-circle"></i> How is plant health calculated?
-                        </button>
+                    <!-- Error Container -->
+                    <div id="error-container" style="display: none;">
+                        <!-- Error content will be dynamically inserted here -->
                     </div>
-                    <div class="collapse" id="healthInfoCollapse">
-                        <div class="card shadow-sm mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Plant Health Percentage - How is it calculated?</h5>
-                                <p>The percentage value for each plant is calculated based on four measured parameters: moisture, temperature, light, and humidity.</p>
-                                <ul>
-                                    <li><strong>Optimal value (100%):</strong> Parameter is within the plant's optimal range</li>
-                                    <li><strong>Warning (50%):</strong> Parameter is between the optimal range and min/max limits</li>
-                                    <li><strong>Critical (0%):</strong> Parameter is below minimum or above maximum threshold</li>
-                                </ul>
-                                <p>The overall percentage is the average of all four parameters, and the color indicates the plant's general condition:<br>
-                                <span class="badge bg-success">Green (≥80%)</span> 
-                                <span class="badge bg-warning">Yellow (40-79%)</span> 
-                                <span class="badge bg-danger">Red (≤39%)</span></p>
+
+                    <!-- Main Dashboard Content -->
+                    <div id="dashboard-container" style="display: none;">
+                        <!-- Room Summary Cards -->
+                        <div id="room-summary-cards" class="row g-4 mb-4">
+                            <!-- Room cards will be dynamically generated here -->
+                        </div>
+
+                        <!-- Health Calculation Info Box -->
+                        <div class="info-toggle-container text-center mb-4 mt-3">
+                            <button class="btn btn-sm btn-outline-info info-button" type="button" data-target="#healthInfoCollapse">
+                                <i class="bi bi-info-circle"></i> How is plant health calculated?
+                            </button>
+                        </div>
+                        <div class="collapse" id="healthInfoCollapse">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Plant Health Percentage - How is it calculated?</h5>
+                                    <p>The percentage value for each plant is calculated based on four measured parameters: moisture, temperature, light, and humidity.</p>
+                                    <ul>
+                                        <li><strong>Optimal value (100%):</strong> Parameter is within the plant's optimal range</li>
+                                        <li><strong>Warning (50%):</strong> Parameter is between the optimal range and min/max limits</li>
+                                        <li><strong>Critical (0%):</strong> Parameter is below minimum or above maximum threshold</li>
+                                    </ul>
+                                    <p>We use these specific thresholds for each parameter (matching Grafana dashboard):</p>
+                                    <ul>
+                                        <li><strong>Moisture:</strong> Red 0-30%, Yellow 30-40%, Green 40-60%, Yellow 60-70%, Red 70-100%</li>
+                                        <li><strong>Temperature:</strong> Red 0-15°C, Yellow 15-18°C, Green 18-25°C, Yellow 25-28°C, Red 28-40°C</li>
+                                        <li><strong>Light:</strong> Red 0-300 lux, Yellow 300-500 lux, Green 500-1000 lux, Yellow 1000-1200 lux, Red 1200-3000 lux</li>
+                                        <li><strong>Humidity:</strong> Red 0-30%, Yellow 30-40%, Green 40-60%, Yellow 60-70%, Red 70-100%</li>
+                                    </ul>
+                                    <p>The overall percentage is the average of all four parameters, and the color indicates the plant's general condition:<br>
+                                    <span class="badge bg-success">Green (≥80%)</span> 
+                                    <span class="badge bg-warning">Yellow (40-79%)</span> 
+                                    <span class="badge bg-danger">Red (≤39%)</span></p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Environmental Summary -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h4 class="section-title">Environmental Summary</h4>
+                        
+                        <!-- Environmental Summary -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4 class="section-title">Environmental Summary</h4>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="row g-4 mb-5">
-                        <!-- Temperature Summary -->
-                        <div class="col-md-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="env-summary">
-                                        <div class="env-icon">🌡️</div>
-                                        <div class="env-details">
-                                            <h5>Temperature</h5>
-                                            <p id="temperature-summary" class="neutral" data-metric="temperature">Collecting data...</p>
+                        
+                        <div class="row g-4 mb-5">
+                            <!-- Temperature Summary -->
+                            <div class="col-md-3">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="env-summary">
+                                            <div class="env-icon">🌡️</div>
+                                            <div class="env-details">
+                                                <h5>Temperature</h5>
+                                                <p id="temperature-summary" class="neutral" data-metric="temperature">Loading...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Humidity Summary -->
+                            <div class="col-md-3">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="env-summary">
+                                            <div class="env-icon">💧</div>
+                                            <div class="env-details">
+                                                <h5>Humidity</h5>
+                                                <p id="humidity-summary" class="neutral" data-metric="humidity">Loading...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Moisture Summary -->
+                            <div class="col-md-3">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="env-summary">
+                                            <div class="env-icon">🌱</div>
+                                            <div class="env-details">
+                                                <h5>Soil Moisture</h5>
+                                                <p id="moisture-summary" class="neutral" data-metric="moisture">Loading...</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Light Summary -->
+                            <div class="col-md-3">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="env-summary">
+                                            <div class="env-icon">☀️</div>
+                                            <div class="env-details">
+                                                <h5>Light Intensity</h5>
+                                                <p id="light-summary" class="neutral" data-metric="light">Loading...</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Humidity Summary -->
-                        <div class="col-md-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="env-summary">
-                                        <div class="env-icon">💧</div>
-                                        <div class="env-details">
-                                            <h5>Humidity</h5>
-                                            <p id="humidity-summary" class="neutral" data-metric="humidity">Collecting data...</p>
-                                        </div>
+                        <!-- System Status -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">System Status</h5>
+                                        <p class="card-text">
+                                            <span class="status-dot active"></span> Monitoring system active
+                                        </p>
+                                        <p class="text-muted small">
+                                            Last data update: <span id="last-update">Loading...</span>
+                                        </p>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Moisture Summary -->
-                        <div class="col-md-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <div class="env-summary">
-                                        <div class="env-icon">🌱</div>
-                                        <div class="env-details">
-                                            <h5>Soil Moisture</h5>
-                                            <p id="moisture-summary" class="neutral" data-metric="moisture">Collecting data...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- System Status -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">System Status</h5>
-                                    <p class="card-text">
-                                        <span class="status-dot active"></span> Monitoring system active
-                                    </p>
-                                    <p class="text-muted small">
-                                        Last data update: <span id="last-update">Initializing...</span>
-                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -234,26 +185,40 @@
         </div>
     </div>
 
-    <!-- jQuery first for modal support -->
+    <!-- jQuery for UI support -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Application JavaScript -->
-    <script src="simpleMockData.js"></script>
+    <!-- Config and API -->
+    <script src="js/config.js"></script>
+    <script src="js/api-client.js"></script>
     
-    <!-- Initialize health info modal functionality -->
+    <!-- PlantManager -->
+    <script src="js/plant-manager.js"></script>
+    
+    <!-- Simple Overview Handler -->
+    <script src="js/overview-handler.js"></script>
+    
+    <!-- Initialize overview -->
     <script>
-      $(document).ready(function() {
-        // Initialize all modals
-        var healthInfoModal = new bootstrap.Modal(document.getElementById('healthCalcModal'));
-        
-        // Custom event handler for the info button
-        $('.health-info-btn').click(function() {
-          healthInfoModal.show();
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing overview page...');
+            
+            // Create global PlantManager instance if it doesn't exist
+            window.plantManager = window.plantManager || new PlantManager();
+            
+            // Create and initialize overview handler
+            const overviewHandler = new SimpleOverviewHandler();
+            overviewHandler.init();
+            
+            // Health info button functionality
+            $('.info-button').click(function() {
+                const targetId = $(this).attr('data-target');
+                $(targetId).toggle();
+            });
         });
-      });
     </script>
 </body>
 </html>
