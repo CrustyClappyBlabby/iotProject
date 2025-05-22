@@ -26,7 +26,7 @@ const CONFIG = {
             LIGHT: 4
         },
         DEFAULT_TIME_RANGE: {
-            FROM: 'now-1h',
+            FROM: 'now-7d',
             TO: 'now'
         },
         THEME: 'light',

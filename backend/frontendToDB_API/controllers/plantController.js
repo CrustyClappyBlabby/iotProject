@@ -1,5 +1,5 @@
 /**
- * Plant Controller - API endpoints for plant data (Simplificeret version)
+ * Plant Controller - API endpoints for plant data
  */
 const influxService = require('../services/influx');
 
@@ -85,9 +85,9 @@ async function getRoomFromDatabase(plantId) {
   try {
     // Simple query to get room for this plant
     const query = `
-      from(bucket: "${process.env.INFLUX_BUCKET || 'PlantMeasurements'}")
+      from(bucket: "${process.env.INFLUX_BUCKET || 'SensorData'}")
         |> range(start: -30d)
-        |> filter(fn: (r) => r._measurement == "plant_test")
+        |> filter(fn: (r) => r._measurement == "sensorData")
         |> filter(fn: (r) => r.Plant_ID == "${plantId}")
         |> group(columns: ["room_ID"])
         |> distinct(column: "room_ID")
@@ -97,6 +97,7 @@ async function getRoomFromDatabase(plantId) {
     const result = await influxService._executeFluxQuery(query);
     
     if (result && result.length > 0) {
+      // Return room_ID value directly without modification
       return result[0].room_ID;
     } else {
       console.log(`No room found for plant ${plantId}`);
@@ -205,7 +206,7 @@ function organizeByRooms(plants) {
 function makeRoomNameFriendly(roomId) {
   const friendlyNames = {
     'living-room': 'Living Room',
-    'livingRoom': 'Living Room',
+    'living_room': 'Living Room',
     'kitchen': 'Kitchen', 
     'bedroom': 'Bedroom'
   };

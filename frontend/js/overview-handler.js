@@ -1,35 +1,34 @@
 /**
- * Simple Overview Handler - main logic for overview page
- * Uses PlantManager for centralised data handling and health calculation
+ * Overview Handler - Main dashboard logic
  */
 class SimpleOverviewHandler {
     constructor() {
         this.plantManager = window.plantManager || new PlantManager();
         this.plants = [];
         this.rooms = [];
-        this.summary = {};
     }
 
+    /**
+     * Initialize overview page
+     */
     async init() {
         console.log('Loading overview page...');
         
         try {
-            // Show loading for spinner
             this.showLoading();
             
-            // Initialize PlantManager if it hasn't been initialized
+            // Load plant data
             if (!this.plantManager.isLoaded) {
                 await this.plantManager.initialize();
             }
             
-            // Get data from plantManager
+            // Get data
             this.plants = this.plantManager.getAllPlants();
             this.rooms = this.plantManager.getAllRooms();
-            this.summary = this.plantManager.discovery?.summary || {};
             
             console.log(`Found ${this.plants.length} plants in ${this.rooms.length} rooms`);
             
-            // Update room health calculations
+            // Update room health
             this.updateRoomHealth();
             
             // Update UI
@@ -37,17 +36,18 @@ class SimpleOverviewHandler {
             this.updateEnvironmentalSummary();
             this.updateSystemStatus();
             
-            // Hide loading and show dashboard
             this.showDashboard();
             
         } catch (error) {
-            console.error('Failed to load overview data:', error);
+            console.error('Failed to load overview:', error);
             this.showError(error);
         }
     }
 
+    /**
+     * Update health calculations for all rooms
+     */
     updateRoomHealth() {
-        // Update health for all rooms
         for (const room of this.rooms) {
             room.updateFromPlants(this.plantManager);
         }
@@ -56,11 +56,9 @@ class SimpleOverviewHandler {
     showLoading() {
         const loading = document.getElementById('loading-container');
         const dashboard = document.getElementById('dashboard-container');
-        if (loading) loading.style.display = 'block'; // show block (css display property)
-        if (dashboard) dashboard.style.display = 'none'; // hide element (css display property)
+        if (loading) loading.style.display = 'block';
+        if (dashboard) dashboard.style.display = 'none';
     }
-
-    // switching between showloading and showdashboard
 
     showDashboard() {
         const loading = document.getElementById('loading-container');
@@ -82,17 +80,20 @@ class SimpleOverviewHandler {
         }
     }
 
+    /**
+     * Render room summary cards
+     */
     renderRoomCards() {
-        const container = document.getElementById('room-summary-cards'); // find html element where room cards will be inserted
+        const container = document.getElementById('room-summary-cards');
         if (!container) return;
 
-        let html = ''; // empty string to gather html build
+        let html = '';
 
-        for (const room of this.rooms) { // loop through all rooms 
-            const roomPlants = this.plantManager.getPlantsByRoom(room.id); // get plants for specific rooms
-            const healthClass = this.getHealthClass(room.averageHealth); // css class based on room health (optimal/warning/critical)
+        for (const room of this.rooms) {
+            const roomPlants = this.plantManager.getPlantsByRoom(room.id);
+            const healthClass = this.getHealthClass(room.averageHealth);
 
-            // Generate plant items for every plant in the room (nested loop)
+            // Generate plant list for this room
             let plantItems = '';
             for (const plant of roomPlants) {
                 const plantHealth = plant.getHealth();
@@ -106,13 +107,9 @@ class SimpleOverviewHandler {
                 `;
             }
 
-            // Room page links (used for dynamic link in View Details button)
-            const roomPages = {
-                'livingRoom': 'livingRoom.html',
-                'kitchen': 'kitchen.html',
-                'bedroom': 'bedroom.html'
-            };
-            // Build room card html with bootstrap styles
+            // Dynamic room URL
+            const roomUrl = `room.html?id=${room.id}`;
+            
             html += `
                 <div class="col-md-4">
                     <div class="card shadow-sm h-100">
@@ -127,48 +124,54 @@ class SimpleOverviewHandler {
                             <div class="plant-list">
                                 ${plantItems}
                             </div>
-                            <a href="${roomPages[room.id] || '#'}" class="btn btn-outline-success w-100 mt-3">View Details</a>
+                            <a href="${roomUrl}" class="btn btn-outline-success w-100 mt-3">View Details</a>
                         </div>
                     </div>
                 </div>
-            `; //template literals
+            `;
         }
 
-        container.innerHTML = html; //replace initial content of container with all the new room cards
+        container.innerHTML = html;
     }
 
+    /**
+     * Update environmental summary with averages
+     */
     updateEnvironmentalSummary() {
-        const metrics = ['temperature', 'humidity', 'moisture', 'light']; // metric array defined
+        const metrics = ['temperature', 'humidity', 'moisture', 'light'];
         
-        for (const metric of metrics) { //loops through each individual metric
+        for (const metric of metrics) {
             const values = this.plants 
-                .map(plant => plant.data[metric]) //extract specific metric from each plant
-                .filter(v => v != null); //removes any(v) null or undefined values
+                .map(plant => plant.data[metric])
+                .filter(v => v != null);
             
             if (values.length > 0) {
-                const avg = values.reduce((sum, val) => sum + val, 0) / values.length; // calculated average
-                const element = document.getElementById(`${metric}-summary`); // find specifc html element
+                const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const element = document.getElementById(`${metric}-summary`);
                 
                 if (element) {
                     let displayText;
                     switch(metric) {
                         case 'temperature':
-                            displayText = `Average: ${avg.toFixed(1)}°C`; //fixed to 1 decimal
+                            displayText = `Average: ${avg.toFixed(1)}°C`;
                             break;
                         case 'humidity':
                         case 'moisture':
-                            displayText = `Average: ${avg.toFixed(0)}%`; //fixed to 0 decimal
+                            displayText = `Average: ${avg.toFixed(0)}%`;
                             break;
                         case 'light':
                             displayText = `Average: ${avg.toFixed(0)} lux`;
                             break;
                     }
-                    element.textContent = displayText; //update html
+                    element.textContent = displayText;
                 }
             }
         }
     }
 
+    /**
+     * Update system status timestamp
+     */
     updateSystemStatus() {
         const lastUpdateElement = document.getElementById('last-update');
         if (lastUpdateElement) {
@@ -177,12 +180,15 @@ class SimpleOverviewHandler {
         }
     }
 
-    getHealthClass(health) { // convert health percent to css
-        if (health >= 80) return 'optimal'; // green
-        if (health >= 40) return 'warning'; // yellow
-        return 'critical'; // red
+    /**
+     * Convert health percentage to CSS class
+     */
+    getHealthClass(health) {
+        if (health >= 80) return 'optimal';
+        if (health >= 40) return 'warning';
+        return 'critical';
     }
 }
 
-// Export to global
+// Export globally
 window.SimpleOverviewHandler = SimpleOverviewHandler;

@@ -1,43 +1,44 @@
 /**
- * Room Page Handler
- * Uses PlantManager for centralized data handling and health calculation
+ * Room Page Handler - Manages individual room pages
  */
 class SimpleRoomHandler {
-    constructor(roomId) { // takes roomId as parameter
+    constructor(roomId) {
         this.roomId = roomId;
-        this.plantManager = window.plantManager || new PlantManager(); // uses PlantManager class for handling data
+        this.plantManager = window.plantManager || new PlantManager();
+        this.roomUtils = new RoomUtils();
         this.plants = [];
         this.roomData = null;
     }
 
+    /**
+     * Initialize room page
+     */
     async init() {
         console.log(`Loading ${this.roomId} page...`);
         
         try {
-            // Show loading
             this.showLoading();
             
-            // Initialize PlantManager if it hasn't been initialized
+            // Initialize PlantManager if needed
             if (!this.plantManager.isLoaded) {
                 await this.plantManager.initialize();
             }
             
-            // Get plants for this room
+            // Get room data
             this.plants = this.plantManager.getPlantsByRoom(this.roomId);
             this.roomData = this.plantManager.getRoom(this.roomId);
             
             console.log(`Found ${this.plants.length} plants for ${this.roomId}`);
             
-            // Update UI
-            this.updateRoomStatus();
+            // Update page
+            this.updateRoomInfo();
             this.updateEnvironmentalSummary();
             this.renderPlants();
             
-            // Hide loading
             this.hideLoading();
             
         } catch (error) {
-            console.error('Failed to load room data:', error);
+            console.error('Failed to load room:', error);
             this.showError(error);
         }
     }
@@ -48,8 +49,6 @@ class SimpleRoomHandler {
         if (loading) loading.style.display = 'block';
         if (container) container.style.display = 'none';
     }
-
-    //switch between (as in overview-handler.js)
 
     hideLoading() {
         const loading = document.getElementById('loading-container');
@@ -71,30 +70,41 @@ class SimpleRoomHandler {
         }
     }
 
-    updateRoomStatus() {
-        if (!this.plants.length) return;
+    /**
+     * Update room status and title
+     */
+    updateRoomInfo() {
+        if (!this.roomData || this.plants.length === 0) return;
         
-        // Get room health from Room object
-        if (this.roomData) {
-            this.roomData.updateFromPlants(this.plantManager);
-            const avgHealth = this.roomData.averageHealth;
-            
-            // Update room status
-            const statusEl = document.getElementById(`${this.roomId}-status`);
-            if (statusEl) {
-                statusEl.textContent = `Room Health: ${avgHealth}%`;
-                statusEl.className = `room-status ${this.getHealthClass(avgHealth)}`;
-            }
+        // Update room health
+        this.roomData.updateFromPlants(this.plantManager);
+        
+        // Update room status display
+        const statusEl = document.getElementById(`${this.roomId}-status`);
+        if (statusEl) {
+            statusEl.textContent = `Room Health: ${this.roomData.averageHealth}%`;
+            statusEl.className = `room-status ${this.getHealthClass(this.roomData.averageHealth)}`;
+        }
+        
+        // Update page title
+        const titleEl = document.getElementById('room-title');
+        if (titleEl) {
+            titleEl.textContent = this.roomData.name || this.roomId;
         }
     }
 
+    /**
+     * Update environmental summary averages
+     */
     updateEnvironmentalSummary() {
-        if (!this.plants.length) return;
+        if (this.plants.length === 0) return;
         
         const metrics = ['moisture', 'temperature', 'light', 'humidity'];
         
         for (const metric of metrics) {
-            const values = this.plants.map(plant => plant.data[metric]).filter(v => v != null);
+            const values = this.plants
+                .map(plant => plant.data[metric])
+                .filter(v => v != null);
             
             if (values.length > 0) {
                 const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
@@ -120,6 +130,9 @@ class SimpleRoomHandler {
         }
     }
 
+    /**
+     * Render all plants in this room
+     */
     renderPlants() {
         const plantSection = document.getElementById('plant-section');
         if (!plantSection) return;
@@ -131,8 +144,8 @@ class SimpleRoomHandler {
         
         let html = '';
         
-        for (const plant of this.plants) { //loop through every plant
-            const health = plant.getHealth(); // gets health status and converts to css class
+        for (const plant of this.plants) {
+            const health = plant.getHealth();
             const healthClass = this.getHealthClass(health);
             
             html += `
@@ -142,18 +155,10 @@ class SimpleRoomHandler {
                             <h5 class="card-title mb-0">${plant.name}</h5> 
                             <div class="d-flex align-items-center">
                                 <div class="plant-indicators me-3">
-                                    <div class="indicator-item ${plant.getMetricStatus('moisture')}" title="Moisture">
-                                        <span>💧</span>
-                                    </div>
-                                    <div class="indicator-item ${plant.getMetricStatus('temperature')}" title="Temperature">
-                                        <span>🌡️</span>
-                                    </div>
-                                    <div class="indicator-item ${plant.getMetricStatus('light')}" title="Light">
-                                        <span>☀️</span>
-                                    </div>
-                                    <div class="indicator-item ${plant.getMetricStatus('humidity')}" title="Humidity">
-                                        <span>💦</span>
-                                    </div>
+                                    <div class="indicator-item ${plant.getMetricStatus('moisture')}" title="Moisture">💧</div>
+                                    <div class="indicator-item ${plant.getMetricStatus('temperature')}" title="Temperature">🌡️</div>
+                                    <div class="indicator-item ${plant.getMetricStatus('light')}" title="Light">☀️</div>
+                                    <div class="indicator-item ${plant.getMetricStatus('humidity')}" title="Humidity">💦</div>
                                 </div>
                                 <span class="toggle-icon"><span id="toggle-${plant.id}">⌄</span></span>
                             </div>
@@ -238,12 +243,12 @@ class SimpleRoomHandler {
         plantSection.innerHTML = html;
     }
 
+    /**
+     * Generate Grafana chart URL
+     */
     getGrafanaUrl(plantId, roomId, metric) {
-        // Get Grafana configuration from PlantConfig
         const baseUrl = window.PlantConfig.GRAFANA.BASE_URL;
         const dashboardSlug = window.PlantConfig.GRAFANA.DASHBOARD_UID;
-        const dashboardTitle = 'dynamic-plant-monitoring-dashboard';
-        const orgId = window.PlantConfig.GRAFANA.ORG_ID;
         const panelId = window.PlantConfig.GRAFANA.DEFAULT_PANELS[metric.toUpperCase()];
         
         if (!panelId) {
@@ -251,19 +256,20 @@ class SimpleRoomHandler {
             return '';
         }
         
-        // Generate URL matching grafana format
-        const url = `${baseUrl}/d-solo/${dashboardSlug}/${dashboardTitle}?` +
-                   `orgId=${orgId}&` +
-                   `timezone=browser&` +
-                   `var-plantid=${plantId}&` +
-                   `var-roomid=${roomId}&` +
-                   `refresh=10s&` +
-                   `theme=light&` +
-                   `panelId=${panelId}&` +
-                   `__feature.dashboardSceneSolo`;
+        // Convert room ID to database format
+        const dbRoomId = this.roomUtils.denormalizeRoomId(roomId);
         
-        console.log(`Generated Grafana URL for ${plantId} ${metric}:`, url);
-        return url;
+        const now = Date.now();
+        const from = now - (7 * 24 * 60 * 60 * 1000); // 7 days back
+        
+        return `${baseUrl}/d-solo/${dashboardSlug}/dynamic-plant-monitoring-dashboard?` +
+               `orgId=1&` +
+               `from=${from}&` +
+               `to=${now}&` +
+               `var-plantid=${plantId}&` +
+               `var-roomid=${dbRoomId}&` +
+               `panelId=${panelId}&` +
+               `theme=light`;
     }
 
     getHealthClass(health) {
@@ -273,7 +279,7 @@ class SimpleRoomHandler {
     }
 }
 
-// Global toggle function for plant panels
+// Global function for plant panel toggling
 function togglePlantPanel(plantId) {
     const panel = document.getElementById(`panel-${plantId}`);
     const icon = document.getElementById(`toggle-${plantId}`);
@@ -289,5 +295,5 @@ function togglePlantPanel(plantId) {
     }
 }
 
-// Export for global use
+// Export globally
 window.SimpleRoomHandler = SimpleRoomHandler;

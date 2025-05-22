@@ -86,9 +86,9 @@ class PlantDiscoveryService {
     async getRoomFromDB(plantId) {
     try {
         const query = `
-            from(bucket: "${process.env.INFLUX_BUCKET || 'PlantMeasurements'}")
+            from(bucket: "${process.env.INFLUX_BUCKET || 'SensorData'}")
             |> range(start: -24h)
-            |> filter(fn: (r) => r._measurement == "plant_test")
+            |> filter(fn: (r) => r._measurement == "sensorData")
             |> filter(fn: (r) => r.Plant_ID == "${plantId}")
             |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
             |> limit(n: 1)
@@ -113,6 +113,7 @@ class PlantDiscoveryService {
         
         // Step 4: Check if room_ID exists
         if (firstItem.room_ID) {
+            // Simply return the room_ID value directly
             return firstItem.room_ID;
         } else {
             console.log(`No room_ID found for plant ${plantId}`);
@@ -154,7 +155,7 @@ class PlantDiscoveryService {
                 totalRooms: rooms.size,
                 lastUpdate: new Date()
             }
-        };
+        };getRoomFromDB 
     }
 
     /**
@@ -163,8 +164,9 @@ class PlantDiscoveryService {
     friendlyRoomName(roomId) {
         const nameMap = {
             'living-room': 'Living Room',
-            'livingRoom': 'Living Room',  // Handle both formats
-            'kitchen': 'Kitchen',
+            'livingRoom': 'Living Room',
+            'living_room': 'Living Room',
+            'kitchen': 'Kitchen', 
             'bedroom': 'Bedroom'
         };
         

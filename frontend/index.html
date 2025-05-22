@@ -18,20 +18,9 @@
             <div class="col-auto sidebar">
                 <div class="leaf-logo">Leaf<sup>ITM</sup></div>
                 <div class="nav flex-column">
+                    <!-- Will be dynamically filled by room-utils.js -->
                     <a class="nav-link active" href="index.html">
-                        <span class="nav-icon">🏠</span> Overview
-                    </a>
-                    <a class="nav-link" href="livingRoom.html">
-                        <span class="nav-icon">🛋️</span> Living Room
-                    </a>
-                    <a class="nav-link" href="kitchen.html">
-                        <span class="nav-icon">🍽️</span> Kitchen
-                    </a>
-                    <a class="nav-link" href="bedroom.html">
-                        <span class="nav-icon">🛏️</span> Bedroom
-                    </a>
-                    <a class="nav-link" href="manage.html">
-                        <span class="nav-icon">⚙️</span> Manage
+                        <span class="nav-icon"></span> Overview
                     </a>
                 </div>
             </div>
@@ -73,23 +62,42 @@
                             <div class="card shadow-sm mb-4">
                                 <div class="card-body">
                                     <h5 class="card-title">Plant Health Percentage - How is it calculated?</h5>
-                                    <p>The percentage value for each plant is calculated based on four measured parameters: moisture, temperature, light, and humidity.</p>
+                                    
+                                    <h6 class="mt-3">Step 1: Check 4 sensors for each plant</h6>
                                     <ul>
-                                        <li><strong>Optimal value (100%):</strong> Parameter is within the plant's optimal range</li>
-                                        <li><strong>Warning (50%):</strong> Parameter is between the optimal range and min/max limits</li>
-                                        <li><strong>Critical (0%):</strong> Parameter is below minimum or above maximum threshold</li>
+                                        <li><strong>Soil Moisture</strong></li>
+                                        <li><strong>Temperature</strong></li>
+                                        <li><strong>Light Intensity</strong></li>
+                                        <li><strong>Air Humidity</strong></li>
                                     </ul>
-                                    <p>We use these specific thresholds for each parameter (matching Grafana dashboard):</p>
+
+                                    <h6 class="mt-3">Step 2: Give points to each sensor</h6>
                                     <ul>
-                                        <li><strong>Moisture:</strong> Red 0-30%, Yellow 30-40%, Green 40-60%, Yellow 60-70%, Red 70-100%</li>
-                                        <li><strong>Temperature:</strong> Red 0-15°C, Yellow 15-18°C, Green 18-25°C, Yellow 25-28°C, Red 28-40°C</li>
-                                        <li><strong>Light:</strong> Red 0-300 lux, Yellow 300-500 lux, Green 500-1000 lux, Yellow 1000-1200 lux, Red 1200-3000 lux</li>
-                                        <li><strong>Humidity:</strong> Red 0-30%, Yellow 30-40%, Green 40-60%, Yellow 60-70%, Red 70-100%</li>
+                                        <li><strong>Optimal range (100 points):</strong> Optimal conditions for the plant</li>
+                                        <li><strong>Warning range (50 points):</strong> Not ideal, but acceptable</li>
+                                        <li><strong>Critical range (0 points):</strong> Bad conditions for the plant</li>
                                     </ul>
-                                    <p>The overall percentage is the average of all four parameters, and the color indicates the plant's general condition:<br>
-                                    <span class="badge bg-success">Green (≥80%)</span> 
-                                    <span class="badge bg-warning">Yellow (40-79%)</span> 
-                                    <span class="badge bg-danger">Red (≤39%)</span></p>
+
+                                    <h6 class="mt-3">Step 3: Calculate average</h6>
+                                    <p><strong>Plant Health = (Points from all 4 sensors) ÷ 4</strong></p>
+
+                                    <h6 class="mt-3">Example calculation:</h6>
+                                    <div class="bg-light p-3 rounded mb-3">
+                                        <strong>Plant "Ficus":</strong><br>
+                                        • Moisture: 45% → <span class="text-success">100 points</span> (optimal: 40-60%)<br>
+                                        • Temperature: 16°C → <span class="text-warning">50 points</span> (warning: 15-18°C)<br>
+                                        • Light: 200 lux → <span class="text-danger">0 points</span> (critical: 0-300 lux)<br>
+                                        • Humidity: 55% → <span class="text-success">100 points</span> (optimal: 40-60%)<br>
+                                        <hr>
+                                        <strong>Result:</strong> (100 + 50 + 0 + 100) ÷ 4 = <strong>62.5% ≈ 63%</strong>
+                                    </div>
+
+                                    <h6 class="mt-3">Color coding:</h6>
+                                    <p>
+                                        <span class="badge bg-success">Green (≥80%)</span> Plant is healthy<br>
+                                        <span class="badge bg-warning">Yellow (40-79%)</span> Plant is okay<br>
+                                        <span class="badge bg-danger">Red (≤39%)</span> Plant needs attention
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -197,13 +205,15 @@
     
     <!-- PlantManager -->
     <script src="js/plant-manager.js"></script>
+    <!-- Dynamic room utils -->
+    <script src="js/room-utils.js"></script>
     
-    <!-- Simple Overview Handler -->
+    <!-- Overview Handler -->
     <script src="js/overview-handler.js"></script>
     
     <!-- Initialize overview -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('Initializing overview page...');
             
             // Create global PlantManager instance if it doesn't exist
@@ -211,7 +221,11 @@
             
             // Create and initialize overview handler
             const overviewHandler = new SimpleOverviewHandler();
-            overviewHandler.init();
+            await overviewHandler.init();
+            
+            // Update sidebar with dynamic room links
+            const roomUtils = new RoomUtils(window.plantManager);
+            roomUtils.updateSidebar();
             
             // Health info button functionality
             $('.info-button').click(function() {

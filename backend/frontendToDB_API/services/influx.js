@@ -53,7 +53,7 @@ async function getPlants() {
   const query = `
     from(bucket: "${dbConfig.bucket}")
       |> range(start: -30d)
-      |> filter(fn: (r) => r._measurement == "plant_test")
+      |> filter(fn: (r) => r._measurement == "sensorData")
       |> group(columns: ["Plant_ID"])
       |> distinct(column: "Plant_ID")
   `;
@@ -81,7 +81,7 @@ async function getLatestPlantValues(plantId) {
   const query = `
     from(bucket: "${dbConfig.bucket}")
       |> range(start: -30d)
-      |> filter(fn: (r) => r._measurement == "plant_test")
+      |> filter(fn: (r) => r._measurement == "sensorData")
       |> filter(fn: (r) => r.Plant_ID == "${plantId}")
       |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
       |> sort(columns: ["_time"], desc: true)
