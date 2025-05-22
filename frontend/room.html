@@ -172,22 +172,6 @@
             const roomUtils = new RoomUtils(window.plantManager);
             roomUtils.updateSidebar();
         });
-        
-        // Global toggle function for plant panels
-        function togglePlantPanel(plantId) {
-            const panel = document.getElementById(`panel-${plantId}`);
-            const icon = document.getElementById(`toggle-${plantId}`);
-            
-            if (!panel) return;
-            
-            if (panel.style.display === 'none' || panel.style.display === '') {
-                $(panel).slideDown(200);
-                if (icon) icon.textContent = '⌃';
-            } else {
-                $(panel).slideUp(200);
-                if (icon) icon.textContent = '⌄';
-            }
-        }
     </script>
 </body>
 </html>

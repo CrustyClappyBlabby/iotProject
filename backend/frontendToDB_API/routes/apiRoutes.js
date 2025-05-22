@@ -8,13 +8,13 @@ const plantController = require('../controllers/plantController');
 // Health check
 router.get('/health', plantController.healthCheck);
 
-// Test InfluxDB connection  
-router.get('/test', plantController.testConnection);
-
 // Main endpoint - gets all plants
 router.get('/discover', plantController.discoverAll);
 
-// Individual plant data
+// Individual plant data (hvis du vil beholde den)
 router.get('/plants/:id', plantController.getPlantData);
+
+// Test endpoint (fjern i production)
+router.get('/test', plantController.testConnection);
 
 module.exports = router;

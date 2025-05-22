@@ -256,9 +256,6 @@ class SimpleRoomHandler {
             return '';
         }
         
-        // Convert room ID to database format
-        const dbRoomId = this.roomUtils.denormalizeRoomId(roomId);
-        
         const now = Date.now();
         const from = now - (7 * 24 * 60 * 60 * 1000); // 7 days back
         
@@ -267,7 +264,7 @@ class SimpleRoomHandler {
                `from=${from}&` +
                `to=${now}&` +
                `var-plantid=${plantId}&` +
-               `var-roomid=${dbRoomId}&` +
+               `var-roomid=${roomId}&` +
                `panelId=${panelId}&` +
                `theme=light`;
     }

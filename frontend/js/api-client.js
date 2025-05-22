@@ -34,14 +34,6 @@ class PlantAPIClient {
     async getPlantData(plantId) {
         return await this.request(`/plants/${plantId}`);
     }
-
-    async healthCheck() {
-        return await this.request('/health');
-    }
-
-    getConnectionStatus() {
-        return { isOnline: this.isOnline };
-    }
 }
 
 // Export to global instance of class

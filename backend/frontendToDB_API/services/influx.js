@@ -1,5 +1,5 @@
 /**
- * InfluxDB Service - Simplified version
+ * InfluxDB Service
  * Handles database queries using Flux language
  */
 const { InfluxDB } = require('@influxdata/influxdb-client');
@@ -111,9 +111,31 @@ async function getLatestPlantValues(plantId) {
   }
 }
 
+/**
+ * Get room ID for a specific plant
+ */
+async function getPlantRoom(plantId) {
+  const query = `
+    from(bucket: "${dbConfig.bucket}")
+      |> range(start: -30d)
+      |> filter(fn: (r) => r._measurement == "sensorData")
+      |> filter(fn: (r) => r.Plant_ID == "${plantId}")
+      |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+      |> limit(n: 1)
+  `;
+  
+  try {
+    const data = await _executeFluxQuery(query);
+    return data?.[0]?.room_ID || null;
+  } catch (error) {
+    console.error(`Error getting room for ${plantId}:`, error);
+    return null;
+  }
+}
+
 module.exports = {
   testConnection,
   getPlants,
   getLatestPlantValues,
-  _executeFluxQuery
+  getPlantRoom
 };

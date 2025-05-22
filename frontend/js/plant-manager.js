@@ -94,18 +94,6 @@ class PlantManager {
         }
     }
 
-
-
-    /**
-     * Convert room ID from database format to frontend format
-     * Example: 'living_room' -> 'livingRoom'
-     */
-    normalizeRoomId(roomId) {
-        if (roomId === 'living_room') return 'livingRoom';
-        if (roomId === 'dining_room') return 'diningRoom';
-        return roomId;
-    }
-
     // Getter methods
     getAllPlants() {
         return Array.from(this.plants.values());
@@ -294,6 +282,3 @@ class Room {
 
 // Export classes globally
 window.PlantManager = PlantManager;
-window.Plant = Plant;
-window.Room = Room;
-window.PlantThresholds = PlantThresholds;

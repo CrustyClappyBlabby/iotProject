@@ -4,197 +4,109 @@
  */
 const influxService = require('./influx');
 
-class PlantDiscoveryService {
-    constructor() {
-        // Simple cache to avoid repeated database calls
-        this.cache = {
-            data: null,
-            lastUpdate: null
-        };
-        this.cacheTimeout = 5 * 60 * 1000; // keeps cache for 5 minutes
+// Cache to avoid repeated database calls
+let cache = {
+    data: null,
+    timestamp: 0
+};
+
+const CACHE_DURATION = 5 * 60 * 1000; // keeps cache for 5 minutes
+
+/**
+ * Discover all plants and organize them by rooms
+ */
+async function discoverAllPlants() {
+    // Return cached data if still valid
+    if (cache.data && (Date.now() - cache.timestamp < CACHE_DURATION)) {
+        return cache.data;
     }
 
-    /**
-     * Discover all plants and organize them by rooms
-     */
-    async discoverAllPlants() {
-        // Return cached data if still valid
-        if (this.isCacheValid()) {
-            return this.cache.data;
-        }
-
-        const plants = [];
-        
-        try {
-            // Get all plant IDs from database
-            const plantIds = await influxService.getPlants();
-            console.log('Found plant IDs:', plantIds);
-
-            // Get data for each plant
-            for (const plantId of plantIds) {
-                const plantInfo = await this.discoverPlantInfo(plantId);
-                if (plantInfo) {
-                    plants.push(plantInfo);
-                }
-            }
-
-            // Organize data and update cache
-            const result = this.organizeData(plants);
-            this.updateCache(result);
-            
-            return result;
-
-        } catch (error) {
-            console.error('Error discovering plants:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Get information for a specific plant
-     */
-    async discoverPlantInfo(plantId) {
-        try {
-            // Get sensor data from InfluxDB
-            const data = await influxService.getLatestPlantValues(plantId);
-            
-            // Get room information from database tags
-            const roomId = await this.getRoomFromDB(plantId);
-            
-            // Skip plants without data or room assignment
-            if (!data || !roomId) {
-                console.warn(`Skipping ${plantId}: missing data or room`);
-                return null;
-            }
-            
-            return {
-                id: plantId,
-                name: this.generatePlantName(plantId),
-                room: roomId,
-                data: data // Raw sensor values
-            };
-
-        } catch (error) {
-            console.error(`Error discovering plant ${plantId}:`, error);
-            return null;
-        }
-    }
-
-    /**
-     * Get room ID from InfluxDB tags
-     */
-    async getRoomFromDB(plantId) {
     try {
-        const query = `
-            from(bucket: "${process.env.INFLUX_BUCKET || 'SensorData'}")
-            |> range(start: -24h)
-            |> filter(fn: (r) => r._measurement == "sensorData")
-            |> filter(fn: (r) => r.Plant_ID == "${plantId}")
-            |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
-            |> limit(n: 1)
-        `;
+        // Get all plant IDs from database
+        const plantIds = await influxService.getPlants();
         
-        const result = await influxService._executeFluxQuery(query);
+        // Get data for each plant
+        const plantPromises = plantIds.map(id => getPlantInfo(id));
+        const plantResults = await Promise.all(plantPromises);
         
-        // Step 1: Check if we got any results
-        if (!result) {
-            console.log(`No results for plant ${plantId}`);
-            return null;
-        }
+        // Filter out null results
+        const plants = plantResults.filter(plant => plant !== null);
         
-        // Step 2: Check if array has items
-        if (result.length === 0) {
-            console.log(`Empty results for plant ${plantId}`);
-            return null;
-        }
+        // Organize data and update cache
+        const result = {
+            plants,
+            rooms: groupByRooms(plants),
+            summary: {
+                totalPlants: plants.length,
+                totalRooms: new Set(plants.map(p => p.room)).size,
+                lastUpdate: new Date()
+            }
+        };
         
-        // Step 3: Get first item
-        const firstItem = result[0];
+        // Update cache
+        cache.data = result;
+        cache.timestamp = Date.now();
         
-        // Step 4: Check if room_ID exists
-        if (firstItem.room_ID) {
-            // Simply return the room_ID value directly
-            return firstItem.room_ID;
-        } else {
-            console.log(`No room_ID found for plant ${plantId}`);
-            return null;
-        }
-        
+        return result;
+
     } catch (error) {
-        console.error(`Error getting room for ${plantId}:`, error);
+        console.error('Error discovering plants:', error);
+        throw error;
+    }
+}
+
+/**
+ * Get information for a specific plant
+ */
+async function getPlantInfo(plantId) {
+    try {
+        // Get sensor data from InfluxDB
+        const [sensorData, roomId] = await Promise.all([
+            influxService.getLatestPlantValues(plantId),
+            influxService.getPlantRoom(plantId)  // <-- ÆNDRET HER
+        ]);
+        
+        // Skip plants without data or room assignment
+        if (!sensorData || !roomId) {
+            return null;
+        }
+        
+        return {
+            id: plantId,
+            name: plantId,
+            room: roomId,
+            data: sensorData // Raw sensor values
+        };
+
+    } catch (error) {
+        console.error(`Error discovering plant ${plantId}:`, error);
         return null;
     }
 }
 
-    /**
-     * Organize plants by rooms
-     */
-    organizeData(plants) {
-        const rooms = new Map();
-        
-        // Group plants by room
-        for (const plant of plants) {
-            if (!rooms.has(plant.room)) {
-                rooms.set(plant.room, {
-                    id: plant.room,
-                    name: this.friendlyRoomName(plant.room),
-                    plants: []
-                });
-            }
-            
-            // Add plant ID to room
-            rooms.get(plant.room).plants.push(plant.id);
+/**
+ * Organize plants by rooms
+ */
+function groupByRooms(plants) {
+    const roomMap = {};
+    
+    // Group plants by room
+    plants.forEach(plant => {
+        if (!roomMap[plant.room]) {
+            roomMap[plant.room] = {
+                id: plant.room,
+                name: plant.room, // Just use the ID as name
+                plants: []
+            };
         }
-
-        // Return structure that matches frontend PlantManager
-        return {
-            plants,
-            rooms: Array.from(rooms.values()),
-            summary: {
-                totalPlants: plants.length,
-                totalRooms: rooms.size,
-                lastUpdate: new Date()
-            }
-        };getRoomFromDB 
-    }
-
-    /**
-     * Convert room ID to readable name
-     */
-    friendlyRoomName(roomId) {
-        const nameMap = {
-            'living-room': 'Living Room',
-            'livingRoom': 'Living Room',
-            'living_room': 'Living Room',
-            'kitchen': 'Kitchen', 
-            'bedroom': 'Bedroom'
-        };
-        
-        return nameMap[roomId] || roomId;
-    }
-
-    // Cache management
-    isCacheValid() {
-        // Check if we have cache data
-        if (!this.cache.lastUpdate) {
-            return false;
-        }
-        
-        // Check if cache is still fresh
-        const now = Date.now();
-        const cacheAge = now - this.cache.lastUpdate;
-        
-        if (cacheAge < this.cacheTimeout) {
-            return true;  // Cache is still valid
-        } else {
-            return false; // Cache is too old
-        }
-    }
-
-    updateCache(data) {
-        this.cache.data = data;
-        this.cache.lastUpdate = Date.now();
-    }
+        // Add plant ID to room
+        roomMap[plant.room].plants.push(plant.id);
+    });
+    
+    return Object.values(roomMap);
 }
 
-module.exports = PlantDiscoveryService;
+module.exports = {
+    discoverAllPlants,
+    getPlantInfo
+};

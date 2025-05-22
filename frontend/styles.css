@@ -92,20 +92,6 @@ body {
     background-color: var(--neutral-color);
 }
 
-/* Legacy class names for backward compatibility */
-.room-status.good {
-    background-color: var(--good-color);
-}
-
-.room-status.bad {
-    background-color: var(--bad-color);
-}
-
-.status-emoji {
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-}
-
 /* Plant cards */
 .card {
     margin-bottom: 1.5rem;
@@ -197,15 +183,6 @@ body {
     background-color: rgba(108, 117, 125, 0.5);
 }
 
-/* Legacy class names for backward compatibility */
-.indicator-item.good {
-    background-color: rgba(40, 167, 69, 0.8);
-}
-
-.indicator-item.bad {
-    background-color: rgba(220, 53, 69, 0.8);
-}
-
 /* Chart container adjustments */
 .chart-container {
     margin-bottom: 0.5rem;
@@ -286,22 +263,6 @@ body {
     color: var(--neutral-color);
 }
 
-/* Legacy class names for backward compatibility */
-.status-indicator.good {
-    background-color: rgba(40, 167, 69, 0.15);
-    color: var(--good-color);
-}
-
-.status-indicator.bad {
-    background-color: rgba(220, 53, 69, 0.15);
-    color: var(--bad-color);
-}
-
-.status-message {
-    margin-left: 0.5rem;
-    font-size: 0.9rem;
-}
-
 /* Health percentage text styling */
 .health-percentage {
     margin-left: 5px;
@@ -324,15 +285,6 @@ body {
 
 .health-percentage.neutral {
     color: var(--neutral-color);
-}
-
-/* Legacy class names for backward compatibility */
-.health-percentage.good {
-    color: var(--good-color);
-}
-
-.health-percentage.bad {
-    color: var(--bad-color);
 }
 
 /* Style for health percentages in overview */
