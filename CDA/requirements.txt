@@ -1,3 +1,8 @@
+RPI.GPIO
 adafruit-blinka
 adafruit-circuitpython-dht
-paho-mqtt
+adafruit-circuitpython-ads1x15
+paho-mqtt>=2.0.0  # Updated for better MQTT v5 support
+smbus2>=0.4.1
+Adafruit_DHT>=1.4.0
+python-logging-loki>=0.3.1  # For better logging (optional)
