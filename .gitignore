@@ -26,6 +26,4 @@ Thumbs.db
 node_modules/
 package-lock.json
 package.json
-**/.claude/settings.local.json
-
 backend/.env
