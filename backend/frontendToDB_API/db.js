@@ -1,6 +1,9 @@
 /**
- * Database configuration
+ * Database Configuration
+ * InfluxDB connection settings from environment variables
  */
+
+require('dotenv').config();
 
 // InfluxDB configuration from environment variables
 const config = {
@@ -15,7 +18,7 @@ const config = {
   // Connection settings
   timeout: process.env.INFLUX_TIMEOUT ? parseInt(process.env.INFLUX_TIMEOUT, 10) : 30000, // Default: 30 seconds
 
-  // Query defaults
+  // Query defaults  
   defaultTimeRange: process.env.DEFAULT_TIME_RANGE || '30d',
   maxResultLimit: process.env.MAX_RESULT_LIMIT ? parseInt(process.env.MAX_RESULT_LIMIT, 10) : 1000
 };

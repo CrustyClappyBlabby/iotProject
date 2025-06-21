@@ -1,5 +1,6 @@
 /**
- * Room Page Handler - Manages individual room pages
+ * Room Page Handler
+ * Listens for data updates and refreshes UI without page reload
  */
 class SimpleRoomHandler {
     constructor(roomId) {
@@ -8,6 +9,9 @@ class SimpleRoomHandler {
         this.roomUtils = new RoomUtils();
         this.plants = [];
         this.roomData = null;
+        
+        // Listen for data updates from PlantManager
+        this.setupDataUpdateListener();
     }
 
     /**
@@ -19,22 +23,13 @@ class SimpleRoomHandler {
         try {
             this.showLoading();
             
-            // Initialize PlantManager if needed
+            // Initialize PlantManager if needed (handles caching and refresh logic)
             if (!this.plantManager.isLoaded) {
                 await this.plantManager.initialize();
             }
             
-            // Get room data
-            this.plants = this.plantManager.getPlantsByRoom(this.roomId);
-            this.roomData = this.plantManager.getRoom(this.roomId);
-            
-            console.log(`Found ${this.plants.length} plants for ${this.roomId}`);
-            
-            // Update page
-            this.updateRoomInfo();
-            this.updateEnvironmentalSummary();
-            this.renderPlants();
-            
+            // Update UI with current data
+            this.updateWithCurrentData();
             this.hideLoading();
             
         } catch (error) {
@@ -43,6 +38,37 @@ class SimpleRoomHandler {
         }
     }
 
+    /**
+     * Listen for data updates from PlantManager
+     * Updates room UI without page reload when new data arrives
+     */
+    setupDataUpdateListener() {
+        window.addEventListener('plantDataUpdated', (event) => {
+            console.log(`Received data update for room ${this.roomId}`);
+            this.updateWithCurrentData();
+        });
+    }
+
+    /**
+     * Update UI with current data from PlantManager
+     * Called both on initial load and on data refresh
+     */
+    updateWithCurrentData() {
+        // Get fresh data for this room
+        this.plants = this.plantManager.getPlantsByRoom(this.roomId);
+        this.roomData = this.plantManager.getRoom(this.roomId);
+        
+        console.log(`Updating room UI with ${this.plants.length} plants`);
+        
+        // Update all UI components
+        this.updateRoomInfo();
+        this.updateEnvironmentalSummary();
+        this.renderPlants();
+    }
+
+    /**
+     * Show/hide loading states
+     */
     showLoading() {
         const loading = document.getElementById('loading-container');
         const container = document.getElementById('room-container');
@@ -63,7 +89,7 @@ class SimpleRoomHandler {
             errorEl.innerHTML = `
                 <div class="alert alert-danger">
                     <strong>Error:</strong> ${error.message}
-                    <button onclick="location.reload()" class="btn btn-sm btn-primary ms-2">Reload</button>
+                    <button onclick="window.plantManager.forceRefresh()" class="btn btn-sm btn-primary ms-2">Retry</button>
                 </div>
             `;
             errorEl.style.display = 'block';
@@ -71,12 +97,12 @@ class SimpleRoomHandler {
     }
 
     /**
-     * Update room status and title
+     * Update room status and title with current data
      */
     updateRoomInfo() {
         if (!this.roomData || this.plants.length === 0) return;
         
-        // Update room health
+        // Update room health calculation
         this.roomData.updateFromPlants(this.plantManager);
         
         // Update room status display
@@ -94,7 +120,7 @@ class SimpleRoomHandler {
     }
 
     /**
-     * Update environmental summary averages
+     * Update environmental summary with current averages
      */
     updateEnvironmentalSummary() {
         if (this.plants.length === 0) return;
@@ -131,7 +157,7 @@ class SimpleRoomHandler {
     }
 
     /**
-     * Render all plants in this room
+     * Render all plants in this room with current data
      */
     renderPlants() {
         const plantSection = document.getElementById('plant-section');
@@ -244,7 +270,7 @@ class SimpleRoomHandler {
     }
 
     /**
-     * Generate Grafana chart URL
+     * Generate Grafana chart URL for plant metrics
      */
     getGrafanaUrl(plantId, roomId, metric) {
         const baseUrl = window.PlantConfig.GRAFANA.BASE_URL;
@@ -256,23 +282,38 @@ class SimpleRoomHandler {
             return '';
         }
         
-        const now = Date.now();
-        const from = now - (7 * 24 * 60 * 60 * 1000); // 7 days back
-        
+        // Use relative time instead of absolute timestamps
         return `${baseUrl}/d-solo/${dashboardSlug}/dynamic-plant-monitoring-dashboard?` +
-               `orgId=1&` +
-               `from=${from}&` +
-               `to=${now}&` +
-               `var-plantid=${plantId}&` +
-               `var-roomid=${roomId}&` +
-               `panelId=${panelId}&` +
-               `theme=light`;
+            `orgId=1&` +
+            `from=now-30d&` +     // Relative: last 30 days
+            `to=now&` +           // Relative: now
+            `var-plantid=${plantId}&` +
+            `var-roomid=${roomId}&` +
+            `panelId=${panelId}&` +
+            `theme=light&` +
+            `refresh=30s`;        // Auto refresh
     }
 
+    /**
+     * Convert health percentage to CSS class
+     */
     getHealthClass(health) {
         if (health >= 80) return 'optimal';
         if (health >= 40) return 'warning';
         return 'critical';
+    }
+
+    /**
+     * Manual refresh button handler
+     */
+    async refreshData() {
+        try {
+            this.showLoading();
+            await this.plantManager.forceRefresh();
+            this.hideLoading();
+        } catch (error) {
+            this.showError(error);
+        }
     }
 }
 
@@ -283,13 +324,38 @@ function togglePlantPanel(plantId) {
     
     if (!panel) return;
     
-    if (panel.style.display === 'none' || panel.style.display === '') {
+    // Check if this panel is currently closed
+    const isCurrentlyClosed = panel.style.display === 'none' || panel.style.display === '';
+    
+    if (isCurrentlyClosed) {
+        // Close all other panels first
+        closeAllPlantPanels();
+        
+        // Then open this one
         $(panel).slideDown(200);
         if (icon) icon.textContent = '⌃';
+        
+        console.log(`Opened plant: ${plantId}, closed all others`);
     } else {
+        // Close this panel
         $(panel).slideUp(200);
         if (icon) icon.textContent = '⌄';
     }
+}
+
+// Helper function to close all panels
+function closeAllPlantPanels() {
+    // Find all plant panels
+    const allPanels = document.querySelectorAll('[id^="panel-"]');
+    const allIcons = document.querySelectorAll('[id^="toggle-"]');
+    
+    allPanels.forEach(panel => {
+        $(panel).slideUp(200);
+    });
+    
+    allIcons.forEach(icon => {
+        icon.textContent = '⌄';
+    });
 }
 
 // Export globally

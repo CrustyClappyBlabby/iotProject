@@ -30,10 +30,6 @@ class PlantAPIClient {
     async discoverPlants() {
         return await this.request('/discover');
     }
-
-    async getPlantData(plantId) {
-        return await this.request(`/plants/${plantId}`);
-    }
 }
 
 // Export to global instance of class

@@ -1,38 +1,33 @@
 /**
- * InfluxDB API Server
- * This server provides endpoints to access data from InfluxDB
+ * Plant Monitoring API Server
+ * Main Express server setup
  */
 
-// Import required packages
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
 // Initialize Express app
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3001;
 
-// Enable CORS for cross-origin requests (all domains can call API)
+// Middleware
 app.use(cors());
 app.use(express.json());
 
 // Import API routes
-const apiRoutes = require('./routes/apiRoutes.js');
-
-// Basic root route
-app.get('/', (req, res) => {
-  res.send('Server is running!');
-});
+const apiRoutes = require('./apiRoutes');
 
 // Mount API routes
 app.use('/api', apiRoutes);
 
-// Simple error handling
+// Global error handling
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  res.status(statusCode).json({
+  console.error('Global error:', err);
+  res.status(500).json({
     success: false,
-    message: err.message || 'Server Error'
+    message: 'Internal server error',
+    error: err.message
   });
 });
 
@@ -44,7 +39,7 @@ app.use((req, res) => {
   });
 });
 
-// Start the server
+// Start server
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Plant monitoring server running on http://localhost:${port}`);
 });
