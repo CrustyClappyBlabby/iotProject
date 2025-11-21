@@ -8,9 +8,9 @@ from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from config import CONFIG
-from sensor.dht11_sensor import DHT11Sensor
-from sensor.light_sensor import LightSensor
-from sensor.soil_sensor import SoilMoistureSensor
+from sensor.emulated_dht11 import EmulatedDHT11Sensor
+from sensor.emulated_light import EmulatedLightSensor
+from sensor.emulated_soil import EmulatedSoilMoistureSensor
 from mqtt.mqtt_client import MqttPublisher
 
 # Configure logging
@@ -38,9 +38,9 @@ publisher = MqttPublisher(
 # Initialize sensors with proper device ID
 try:
     sensors = {
-        "climate": DHT11Sensor(DEVICE_ID),
-        "light": LightSensor(DEVICE_ID),
-        "soil": SoilMoistureSensor(DEVICE_ID)
+        "climate": EmulatedDHT11Sensor(DEVICE_ID),
+        "light": EmulatedLightSensor(DEVICE_ID),
+        "soil": EmulatedSoilMoistureSensor(DEVICE_ID)
     }
     logger.info(f"Initialized {len(sensors)} sensors")
 except Exception as e:
