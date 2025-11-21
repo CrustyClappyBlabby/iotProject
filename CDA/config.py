@@ -1,10 +1,10 @@
 CONFIG = {
     "device_id": "CDA_02",  # Unique identifier for this CDA device
     "room_id": "living_room",  # Default room identifier for this CDA device
-    "broker": "5b3009ec3ac740e9bca14abfc408b9b2.s1.eu.hivemq.cloud",
+    "broker": "884ce594917f4f0bb39af8bf2243097f.s1.eu.hivemq.cloud",
     "port": 8883,
-    "username": "RustyHive",
-    "password": "Jammerlap!234",
+    "username": "sunghyun",
+    "password": "Hivemq2025",
     "topic_prefix": "SensorData",  # Will be used as SensorData/{device_id}
     
     # Sensor configuration
